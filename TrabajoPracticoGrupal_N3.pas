@@ -25,12 +25,12 @@ null=char(0)+char(0)+char(0);
 //Types------------------------------------------------------------------------------
 
 Type
-//cod=array [1..cant_provincias] of char;
-//desc=array [1..cant_provincias] of string[20];
-//cod_sintomas=array [1..cant_sint] of string[3];
-//desc_sintomas=array [1..cant_sint] of string[30];
-//cod_enfermedades=array [1..cant_enf] of string[3];
-//desc_enfermedades=array [1..cant_enf] of string[30];
+cod=array [1..cant_provincias] of char;
+desc=array [1..cant_provincias] of string[20];
+cod_sintomas=array [1..cant_sint] of string[3];
+desc_sintomas=array [1..cant_sint] of string[30];
+cod_enfermedades=array [1..cant_enf] of string[3];
+desc_enfermedades=array [1..cant_enf] of string[30];
 matriz=array[1..cant_enf,1..max_sint]of string[3];
 sintenf = array [1..max_sint] of string[3];
 
@@ -64,11 +64,11 @@ unaHistoria = record
             efector:string[30];
             end;
 
-Provincias = file of unaProvincia;
-Sintomas = file of unSintoma;
-Enfermedades = file of unaEnfermedad;
-Pacientes = file of unPaciente;
-Historias = file of unaHistoria;
+AProv = file of unaProvincia;
+ASint = file of unSintoma;
+AEnf = file of unaEnfermedad;
+APac = file of unPaciente;
+AHist = file of unaHistoria;
 
 
 
@@ -81,12 +81,12 @@ Opcion:integer;
 Andando:boolean;
 
 //para guardar distintos datos cargados por el usuario
-//codprov:cod;
-//detprov:desc;
-//cod_sint:cod_sintomas;
-//desc_sint:desc_sintomas;
-//cod_enf:cod_enfermedades;
-//desc_enf:desc_enfermedades;
+codprov:cod;
+detprov:desc;
+cod_sint:cod_sintomas;
+desc_sint:desc_sintomas;
+cod_enf:cod_enfermedades;
+desc_enf:desc_enfermedades;
 matriz_sintomas:matriz;
 P:unaProvincia;
 S:unSintoma;
@@ -274,11 +274,12 @@ end;
 Procedure boot;
 begin
 CreateDir('C:/TP3');
-assign(Provincias,'C:/TP3/Provincias.dat');
-assign(Enfermedades,'C:/TP3/Enfermedades.dat');
-assign(Sintomas,'C:/TP3/Sintomas.dat');
-assign(Pacientes,'C:/TP3/Pacientes.dat');
-assign(Historias,'C:/TP3/Historias.dat');
+assign(AProv,'C:/TP3/Provincias.dat');
+assign(AEnf,'C:/TP3/Enfermedades.dat');
+assign(ASint,'C:/TP3/Sintomas.dat');
+assign(APac,'C:/TP3/Pacientes.dat');
+assign(AHist,'C:/TP3/Historias.dat');
+end;
 
 
 
