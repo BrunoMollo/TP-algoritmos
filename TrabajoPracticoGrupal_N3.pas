@@ -64,10 +64,6 @@ unaHistoria = record
             efector:string[30];
             end;
 
-
-
-
-
 //Variables globales------------------------------------------------------------------------------
 
 VAR
@@ -487,16 +483,18 @@ var a:boolean;
 begin
 clrscr;
 a:=true;
-    if (acum_sint=cant_sint) then writeln('La base de datos esta llena');
-
-    while (not(acum_sint=cant_sint))and(not eof(ASint)) and (a) do
+if (filesize(ASint)=cant_sint) then writeln('La base de datos esta llena');
+seek(ASint,filesize(ASint));
+    while (not(filesize(ASint)=cant_sint)) and (a) do
         begin
-        write('uwu');
-            //cod_sint[1]:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',cod_sint);
-            //desc_sint[1]:=string_valido('Ingrese el nombre del sintoma: ',1,30);
-            //acum_sint:=acum_sint+1;
+            write('Ingrese el codigo del sintoma: ');
+            readln(S.cod);
+            write('Ingrese el nombre del sintoma: ');
+            readln(S.desc);
+            seek(ASint,filepos(ASint));
+            write(ASint,S);
 
-            if acum_sint<cant_sint then
+            if filesize(ASint)<cant_sint then
                 begin
                 if (opcion_binaria('Desea ingresar otro sintoma? (S/N) ','S','N','MAY') = 'N') then
                     a:=false;
