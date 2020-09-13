@@ -1,0 +1,52 @@
+TP 3
+----------------------------------
+Menu principal:
+	*un procedure que inicialice los punteros(crear si no hay), para eso hay que hacer un procedure Abrir(x:file)
+	*cerrar todo los archivos al final
+
+Provincias: 
+	*chequear si e archivo esta vacio(creado al inicio del programa)
+	*si hay algo cargarlo en el array qeu teniamos y mostrar como siempre(o tabla copada)
+	*si esta vacio podemos:
+			1)cargar el array como siempre y despues pasarlo al archivo en un procedure aparte(esta piola si podemos hacerlo con un procedure reciclable) 
+			2)cargar directamente en el archivo(mepa que no)
+
+Sintomas:
+	*Pasar lo que esta en el archivo a nuestro arreglo (reciclable de provincias???)
+	*mostrar lo que hay (tabla copada?)
+	*ay que agregar una validacion en el la carga del nombre del sintoma para que no se repita(Investigar sobre Macros con parametros)
+	*pasar lo qeu esta en el arreglo al archivo(con lo mismo qeu con provincia??)
+	(Podria hacerse sin el array y trabajar directamente con el disco duro pero hay que poner un limte de 20 sintomas)
+
+Enfermedades:
+	*traer los sintomas del archivo a un array para verificarlos como siempre
+	*mostrar todas las enfermedades del archivo(procedure?? utilizable en prov y sintomas)
+	*hay que verificar que al enfermedad no exista en el archivo (ni codigo, ni nombre) y cargar una por una al archivo
+
+
+Paciente{intrucciones no estan muy claras}:
+	{Todavia hay que mostrar las estadisticas al final???}
+	{que datos se piden aca y cuales en historia clinica???}
+	*pido un dni
+	*me fijo si ya esta en el archivo(Similar a la verificacion de enf???)
+	*si ya esta le grito
+	*si no esta cargo los datos y los inserto en el archivo
+	(hipotesis de datos pedidos:dni, edad,cod-prov, ¿fallecido?)
+
+Historia clinicas:
+	*peidr un dni y fijarse que exista en pacientes.dat(misma funcion boolena que en pacientes pero negada)
+	{si no esta el dni, le tiene qeu salir error nada mas o tiene qeu empezar a cargar los datos del paciente como si estuviera en la opcion 'Pacientes'??}
+	*ingresar una enfermedad {codigo o nombre??} y chequear qeu exista en enf.dat (misma funcion booleana qeu en enfermedades)
+	*mostrar sintomas de la enfermedad
+	*anotar los sintomas qeu tien el paciente{maximo???}
+	*sumar 1 a la cantidad de enfermedades del paciente{supongo}
+	*pido nombre del efector{supongo}
+	*cargo fecha actual{supongo, no se como funca el date()}
+	*meto el registo en el .dat
+
+Estadisticas:TO BE CONTINUED
+	
+	
+
+
+		
