@@ -83,15 +83,16 @@ desc_sint:desc_sintomas;
 cod_enf:cod_enfermedades;
 desc_enf:desc_enfermedades;
 matriz_sintomas:matriz;
+
 P:unaProvincia;
 S:unSintoma;
 E:unaEnfermedad;
+
 AProv:file of unaProvincia;
 ASint:file of unSintoma;
 AEnf:file of unaEnfermedad;
 APac:file of unPaciente;
 AHist:file of unaHistoria;
-
 
 //para llevar rregistro de qeu tan cargado estan los arrays
 acum_sint:integer;
@@ -280,6 +281,19 @@ assign(AEnf,'C:/TP3/Enfermedades.dat');
 assign(ASint,'C:/TP3/Sintomas.dat');
 assign(APac,'C:/TP3/Pacientes.dat');
 assign(AHist,'C:/TP3/Historias.dat');
+
+{$i-}
+reset(AProv);
+if ioresult=2 then Rewrite(AProv);
+reset(AEnf);
+if ioresult=2 then Rewrite(AEnf);
+reset(ASint);
+if ioresult=2 then Rewrite(ASint);
+reset(APac);
+if ioresult=2 then Rewrite(APac);
+reset(AHist);
+if ioresult=2 then Rewrite(AHist);
+{$i+}
 end;
 
 
@@ -564,6 +578,7 @@ end;
 //PROGRAMA PRINCIPAL-----------------------------------------------------------------------------
 
 BEGIN
+boot;
     //Inicializacion de vairaibles
     acum_sint:=0;
     acum_enf:=0;
