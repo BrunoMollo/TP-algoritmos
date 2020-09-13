@@ -59,7 +59,7 @@ unaHistoria = record
             DNI:string[8];
             cod:string[3];
             curado:char;
-           // fecha-ingreso:?;
+            fecha-ingreso:TdateTime;
            // sintomas:array [1..?] of string[3];
             efector:string[30];
             end;
@@ -427,6 +427,8 @@ end;
 
 
 //MODULOS----------------------------------------------------------------------
+
+
 
 Procedure Pacientes;        //INGRESO DE PACIENTES
 var
