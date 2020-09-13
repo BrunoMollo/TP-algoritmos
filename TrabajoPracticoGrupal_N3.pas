@@ -282,9 +282,18 @@ assign(AEnf,'C:/TP3/Enfermedades.dat');
 assign(ASint,'C:/TP3/Sintomas.dat');
 assign(APac,'C:/TP3/Pacientes.dat');
 assign(AHist,'C:/TP3/Historias.dat');
+
 {$i-}
 reset(AProv);
 if ioresult=2 then Rewrite(AProv);
+reset(AEnf);
+if ioresult=2 then Rewrite(AEnf);
+reset(ASint);
+if ioresult=2 then Rewrite(ASint);
+reset(APac);
+if ioresult=2 then Rewrite(APac);
+reset(AHist);
+if ioresult=2 then Rewrite(AHist);
 {$i+}
 end;
 
