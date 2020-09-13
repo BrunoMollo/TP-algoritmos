@@ -72,8 +72,9 @@ unaHistoria = record
 
 VAR
 //Para el menu principal
-Opcion:integer;
+Opcion,h:integer;
 Andando:boolean;
+
 
 //para guardar distintos datos cargados por el usuario
 codprov:cod;
@@ -281,6 +282,16 @@ assign(ASint,'C:/TP3/Sintomas.dat');
 assign(APac,'C:/TP3/Pacientes.dat');
 assign(AHist,'C:/TP3/Historias.dat');
 end;
+
+Procedure shutdown;
+begin
+close(AProv);
+close(AEnf);
+close(ASint);
+close(APac);
+close(AHist);
+end;
+
 
 
 
@@ -592,7 +603,10 @@ BEGIN
             4: Pacientes;
             5: writeln('En construccion');
             6: writeln('En construccion');
-            0: Andando:=False;
+            0: begin
+               Andando:=False;
+               shutdown;
+               end;
             end;
 
 
@@ -605,6 +619,9 @@ BEGIN
         end;
 
 //Saludos
-textcolor(10);writeln('Gracias por utilizar nuestro software :)');
+for h:= 1 to 5 do
+begin
+textcolor(h);writeln('Gracias por utilizar nuestro software :)');
+end;
 readkey;
 END.
