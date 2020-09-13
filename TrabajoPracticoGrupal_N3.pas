@@ -302,7 +302,14 @@ close(APac);
 close(AHist);
 end;
 
-
+Procedure borramela;
+begin
+Rewrite(AProv);
+Rewrite(ASint);
+Rewrite(AEnf);
+Rewrite(APac);
+Rewrite(AHist);
+end;
 
 
 
@@ -479,18 +486,32 @@ end;
 
 
 Procedure Sintomas;     //CARGA DE SINTOMAS
-var a:boolean;
+var
+a:boolean;
+i:integer;
+
 begin
 clrscr;
 a:=true;
+if filesize(ASint)<>0 then
+   begin
+   reset(ASint);
+   Writeln('Sintomas previamente ingresados: ');
+   while not eof(ASint) do
+         begin
+         read(ASint,S);
+         writeln(S.cod,'  ',S.desc);
+         end;
+   writeln('---------------------------------------');
+   end;
+
 if (filesize(ASint)=cant_sint) then writeln('La base de datos esta llena');
-seek(ASint,filesize(ASint));
+
     while (not(filesize(ASint)=cant_sint)) and (a) do
         begin
-            write('Ingrese el codigo del sintoma: ');
-            readln(S.cod);
-            write('Ingrese el nombre del sintoma: ');
-            readln(S.desc);
+            seek(ASint,filesize(ASint));
+            S.cod:=string_num_valido('Ingrese el codigo del sintoma: ',1,3);
+            S.desc:=string_valido('Ingrese el nombre del sintoma: ', 1,20);
             seek(ASint,filepos(ASint));
             write(ASint,S);
 
@@ -566,8 +587,9 @@ boot;
             writeln('4) Pacientes');
             writeln('5) Historias Clinicas');
             writeln('6) Estadisticas');
+            writeln('7) Borrar datos');
             writeln('0) Fin del Programa');textcolor(7);
-            Opcion:=int_valido('Ingrese la opcion: ',0,6);
+            Opcion:=int_valido('Ingrese la opcion: ',0,7);
             Case Opcion of
             1: Provincias;
             2: Sintomas;
@@ -575,6 +597,7 @@ boot;
             4: Pacientes;
             5: writeln('En construccion');
             6: writeln('En construccion');
+            7: Borramela;
             0: begin
                Andando:=False;
                shutdown;
