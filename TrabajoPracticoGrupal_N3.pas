@@ -75,8 +75,9 @@ unaHistoria = record
 
 VAR
 //Para el menu principal
-Opcion:integer;
+Opcion,h:integer;
 Andando:boolean;
+
 
 //para guardar distintos datos cargados por el usuario
 codprov:cod;
@@ -593,6 +594,9 @@ boot;
         end;
 
 //Saludos
-textcolor(10);writeln('Gracias por utilizar nuestro software :)');
+for h:= 1 to 5 do
+begin
+textcolor(h);writeln('Gracias por utilizar nuestro software :)');
+end;
 readkey;
 END.
