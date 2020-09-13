@@ -101,6 +101,21 @@ acum_enf:integer;
 
 //Funciones------------------------------------------------------------------------------
 
+Function rep_sint(reg:unsintoma;campo:integer):boolean; //ingresa un registro de provincia y el numeor del campo que qeures chequar (1:cod, 2:desc)
+var aux:unsintoma;                                      //Te va a tirar un true si esta repetido el campo, si nada se repita va un false
+begin
+    rep_sint:=False;
+    reset(ASint);
+
+    while not eof(ASint) do
+    begin
+    read(ASint,aux);
+       case campo of
+            1:if reg.cod=aux.cod then rep_sint:=True;
+            2:if reg.desc=aux.desc then rep_sint:=True;
+       end;
+    end;
+end;
 
 
 Function string_valido(msn:string; min,max:integer):string;  //FUNCION PARA VALIDAR LOS STRINGS
