@@ -1,4 +1,4 @@
-//berenjena
+
 Program TrabajoPracticoGrupal_V2;
 //******************************************//
 //****      Alumnos:                    ****///
