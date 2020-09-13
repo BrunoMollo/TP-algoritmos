@@ -275,12 +275,42 @@ end;
 
 Procedure boot;
 begin
-CreateDir('C:/TP3');
-assign(AProv,'C:/TP3/Provincias.dat');
-assign(AEnf,'C:/TP3/Enfermedades.dat');
-assign(ASint,'C:/TP3/Sintomas.dat');
-assign(APac,'C:/TP3/Pacientes.dat');
-assign(AHist,'C:/TP3/Historias.dat');
+    CreateDir('C:/TP3');
+    assign(AProv,'C:/TP3/Provincias.dat');
+    {$I-}
+    reset(AProv);
+    if ioresult=2 then
+        rewrite(AProv);
+    {$I+}
+
+    assign(AEnf,'C:/TP3/Enfermedades.dat');
+    {$I-}
+    reset(AEnf);
+    if ioresult=2 then
+        rewrite(AEnf);
+    {$I+}
+
+    assign(ASint,'C:/TP3/Sintomas.dat');
+    {$I-}
+    reset(ASint);
+    if ioresult=2 then
+        rewrite(ASint);
+    {$I+}
+
+    assign(APac,'C:/TP3/Pacientes.dat');
+    {$I-}
+    reset(APac);
+    if ioresult=2 then
+        rewrite(APac);
+    {$I+}
+
+    assign(AHist,'C:/TP3/Historias.dat');
+    {$I-}
+    reset(AHist);
+    if ioresult=2 then
+        rewrite(AHist);
+    {$I+}
+
 end;
 
 Procedure shutdown;
