@@ -275,10 +275,10 @@ Procedure boot;
 begin
 CreateDir('C:/TP3');
 assign(Provincias,'C:/TP3/Provincias.dat');
-assign(Provincias,'C:/TP3/Enfermedades.dat');
-assign(Provincias,'C:/TP3/Sintomas.dat');
-assign(Provincias,'C:/TP3/Pacientes.dat');
-assign(Provincias,'C:/TP3/Historias.dat');
+assign(Enfermedades,'C:/TP3/Enfermedades.dat');
+assign(Sintomas,'C:/TP3/Sintomas.dat');
+assign(Pacientes,'C:/TP3/Pacientes.dat');
+assign(Historias,'C:/TP3/Historias.dat');
 
 
 
