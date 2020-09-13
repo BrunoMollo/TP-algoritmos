@@ -64,11 +64,11 @@ unaHistoria = record
             efector:string[30];
             end;
 
-Provincias = file of unaProvincia;
-Sintomas = file of unSintoma;
-Enfermedades = file of unaEnfermedad;
-Pacientes = file of unPaciente;
-Historias = file of unaHistoria;
+AProv = file of unaProvincia;
+ASint = file of unSintoma;
+AEnf = file of unaEnfermedad;
+APac = file of unPaciente;
+AHist = file of unaHistoria;
 
 
 
@@ -275,10 +275,18 @@ Procedure boot;
 begin
 CreateDir('C:/TP3');
 assign(Provincias,'C:/TP3/Provincias.dat');
+<<<<<<< Updated upstream
 assign(Enfermedades,'C:/TP3/Enfermedades.dat');
 assign(Sintomas,'C:/TP3/Sintomas.dat');
 assign(Pacientes,'C:/TP3/Pacientes.dat');
 assign(Historias,'C:/TP3/Historias.dat');
+=======
+assign(AEnf,'C:/TP3/Enfermedades.dat');
+assign(ASint,'C:/TP3/Sintomas.dat');
+assign(APac,'C:/TP3/Pacientes.dat');
+assign(AHist,'C:/TP3/Historias.dat');
+end;
+>>>>>>> Stashed changes
 
 
 
