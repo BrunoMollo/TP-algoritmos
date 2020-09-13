@@ -1,5 +1,5 @@
 {
-Banana voladora
+TODOS SE LA COMEN
 }
 Program TrabajoPracticoGrupal_V2;
 //******************************************//
