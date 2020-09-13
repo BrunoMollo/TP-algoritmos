@@ -1,3 +1,4 @@
+//berenjena
 Program TrabajoPracticoGrupal_V2;
 //******************************************//
 //****      Alumnos:                    ****///
@@ -64,11 +65,6 @@ unaHistoria = record
             efector:string[30];
             end;
 
-AProv = file of unaProvincia;
-ASint = file of unSintoma;
-AEnf = file of unaEnfermedad;
-APac = file of unPaciente;
-AHist = file of unaHistoria;
 
 
 
@@ -81,16 +77,22 @@ Opcion:integer;
 Andando:boolean;
 
 //para guardar distintos datos cargados por el usuario
-//codprov:cod;
-//detprov:desc;
-//cod_sint:cod_sintomas;
-//desc_sint:desc_sintomas;
-//cod_enf:cod_enfermedades;
-//desc_enf:desc_enfermedades;
+codprov:cod;
+detprov:desc;
+cod_sint:cod_sintomas;
+desc_sint:desc_sintomas;
+cod_enf:cod_enfermedades;
+desc_enf:desc_enfermedades;
 matriz_sintomas:matriz;
 P:unaProvincia;
 S:unSintoma;
 E:unaEnfermedad;
+AProv:file of unaProvincia;
+ASint:file of unSintoma;
+AEnf:file of unaEnfermedad;
+APac:file of unPaciente;
+AHist:file of unaHistoria;
+
 
 //para llevar rregistro de qeu tan cargado estan los arrays
 acum_sint:integer;
@@ -274,19 +276,12 @@ end;
 Procedure boot;
 begin
 CreateDir('C:/TP3');
-assign(Provincias,'C:/TP3/Provincias.dat');
-<<<<<<< Updated upstream
-assign(Enfermedades,'C:/TP3/Enfermedades.dat');
-assign(Sintomas,'C:/TP3/Sintomas.dat');
-assign(Pacientes,'C:/TP3/Pacientes.dat');
-assign(Historias,'C:/TP3/Historias.dat');
-=======
+assign(AProv,'C:/TP3/Provincias.dat');
 assign(AEnf,'C:/TP3/Enfermedades.dat');
 assign(ASint,'C:/TP3/Sintomas.dat');
 assign(APac,'C:/TP3/Pacientes.dat');
 assign(AHist,'C:/TP3/Historias.dat');
 end;
->>>>>>> Stashed changes
 
 
 
