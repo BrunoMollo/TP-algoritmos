@@ -299,6 +299,16 @@ if ioresult=2 then Rewrite(AHist);
 {$i+}
 end;
 
+Procedure shutdown;
+begin
+close(AProv);
+close(AEnf);
+close(ASint);
+close(APac);
+close(AHist);
+end;
+
+
 
 
 
@@ -567,7 +577,10 @@ boot;
             4: Pacientes;
             5: writeln('En construccion');
             6: writeln('En construccion');
-            0: Andando:=False;
+            0: begin
+               Andando:=False;
+               shutdown;
+               end;
             end;
 
 
