@@ -1,7 +1,4 @@
-{
-TODOS SE LA COMEN
-}
-Program TrabajoPracticoGrupal_V2;
+Program TrabajoPracticoGrupal_V3;
 //******************************************//
 //****      Alumnos:                    ****///
 //****  -Di Giacinti Ramiro             ****////
@@ -75,8 +72,9 @@ unaHistoria = record
 
 VAR
 //Para el menu principal
-Opcion:integer;
+Opcion,h:integer;
 Andando:boolean;
+
 
 //para guardar distintos datos cargados por el usuario
 codprov:cod;
@@ -86,16 +84,15 @@ desc_sint:desc_sintomas;
 cod_enf:cod_enfermedades;
 desc_enf:desc_enfermedades;
 matriz_sintomas:matriz;
-
 P:unaProvincia;
 S:unSintoma;
 E:unaEnfermedad;
-
 AProv:file of unaProvincia;
 ASint:file of unSintoma;
 AEnf:file of unaEnfermedad;
 APac:file of unPaciente;
 AHist:file of unaHistoria;
+
 
 //para llevar rregistro de qeu tan cargado estan los arrays
 acum_sint:integer;
@@ -278,28 +275,53 @@ end;
 
 Procedure boot;
 begin
-CreateDir('C:/TP3');
-assign(AProv,'C:/TP3/Provincias.dat');
-assign(AEnf,'C:/TP3/Enfermedades.dat');
-assign(ASint,'C:/TP3/Sintomas.dat');
-assign(APac,'C:/TP3/Pacientes.dat');
-assign(AHist,'C:/TP3/Historias.dat');
+    CreateDir('C:/TP3');
 
-{$i-}
-reset(AProv);
-if ioresult=2 then Rewrite(AProv);
-reset(AEnf);
-if ioresult=2 then Rewrite(AEnf);
-reset(ASint);
-if ioresult=2 then Rewrite(ASint);
-reset(APac);
-if ioresult=2 then Rewrite(APac);
-reset(AHist);
-if ioresult=2 then Rewrite(AHist);
-{$i+}
+    assign(AProv,'C:/TP3/Provincias.dat');
+    {$I-}
+    reset(AProv);
+    if ioresult=2 then
+        rewrite(AProv);
+    {$I+}
+
+    assign(AEnf,'C:/TP3/Enfermedades.dat');
+    {$I-}
+    reset(AEnf);
+    if ioresult=2 then
+        rewrite(AEnf);
+    {$I+}
+
+    assign(ASint,'C:/TP3/Sintomas.dat');
+    {$I-}
+    reset(ASint);
+    if ioresult=2 then
+        rewrite(ASint);
+    {$I+}
+
+    assign(APac,'C:/TP3/Pacientes.dat');
+    {$I-}
+    reset(APac);
+    if ioresult=2 then
+        rewrite(APac);
+    {$I+}
+
+    assign(AHist,'C:/TP3/Historias.dat');
+    {$I-}
+    reset(AHist);
+    if ioresult=2 then
+        rewrite(AHist);
+    {$I+}
+
 end;
 
-
+Procedure shutdown;
+begin
+close(AProv);
+close(AEnf);
+close(ASint);
+close(APac);
+close(AHist);
+end;
 
 
 
@@ -405,6 +427,7 @@ end;
 
 
 //MODULOS----------------------------------------------------------------------
+
 
 Procedure Pacientes;        //INGRESO DE PACIENTES
 var
@@ -538,7 +561,6 @@ end;
 //PROGRAMA PRINCIPAL-----------------------------------------------------------------------------
 
 BEGIN
-boot;
     //Inicializacion de vairaibles
     acum_sint:=0;
     acum_enf:=0;
@@ -567,7 +589,10 @@ boot;
             4: Pacientes;
             5: writeln('En construccion');
             6: writeln('En construccion');
-            0: Andando:=False;
+            0: begin
+               Andando:=False;
+               shutdown;
+               end;
             end;
 
 
@@ -580,6 +605,9 @@ boot;
         end;
 
 //Saludos
-textcolor(10);writeln('Gracias por utilizar nuestro software :)');
+for h:= 1 to 5 do
+begin
+textcolor(h);writeln('Gracias por utilizar nuestro software :)');
+end;
 readkey;
 END.
