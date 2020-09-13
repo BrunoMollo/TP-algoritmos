@@ -529,7 +529,7 @@ end;
 
 
 
-Procedure Provincias;        //CARGA DE PROVINCIAS
+Procedure Provincias;       //CARGA DE PROVINCIAS
 var
 acum,i:integer;
 begin
