@@ -1,7 +1,4 @@
-{
-TODOS SE LA COMEN
-}
-Program TrabajoPracticoGrupal_V2;
+Program TrabajoPracticoGrupal_V3;
 //******************************************//
 //****      Alumnos:                    ****///
 //****  -Di Giacinti Ramiro             ****////
@@ -391,6 +388,49 @@ end;
 
 
 //MODULOS----------------------------------------------------------------------
+
+//Procedure INICIALIZACION;
+//begin
+//    CreateDir('D:/TP3');
+
+//    assing (,'TP3/provincias.dat');
+//    {$I-}
+//    reset();
+//    if ioresult=2 then
+//        rewrite();
+//    {$I+}
+
+//    assing (,'TP3/enfermedades.dat');
+//    {$I-}
+//    reset();
+//    if ioresult=2 then
+//        rewrite();
+//    {$I+}
+
+//    assing (,'TP3/sintomas.dat');
+//    {$I-}
+//    reset();
+//    if ioresult=2 then
+//        rewrite();
+//    {$I+}
+
+//    assing (,'TP3/pacientes.dat');
+//    {$I-}
+//    reset();
+//    if ioresult=2 then
+//        rewrite();
+//    {$I+}
+
+//    assing (,'TP3/historias.dat');
+//    {$I-}
+//    reset();
+//    if ioresult=2 then
+//        rewrite();
+//    {$I+}
+
+
+//end;
+
 
 Procedure Pacientes;        //INGRESO DE PACIENTES
 var
