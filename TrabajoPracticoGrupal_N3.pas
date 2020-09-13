@@ -275,7 +275,6 @@ end;
 
 Procedure boot;
 begin
-<<<<<<< HEAD
     CreateDir('C:/TP3');
 
     assign(AProv,'C:/TP3/Provincias.dat');
@@ -313,13 +312,6 @@ begin
         rewrite(AHist);
     {$I+}
 
-=======
-CreateDir('C:/TP3');
-assign(AProv,'C:/TP3/Provincias.dat');
-assign(AEnf,'C:/TP3/Enfermedades.dat');
-assign(ASint,'C:/TP3/Sintomas.dat');
-assign(APac,'C:/TP3/Pacientes.dat');
-assign(AHist,'C:/TP3/Historias.dat');
 end;
 
 Procedure shutdown;
@@ -329,11 +321,7 @@ close(AEnf);
 close(ASint);
 close(APac);
 close(AHist);
->>>>>>> master
 end;
-
-
-
 
 
 
