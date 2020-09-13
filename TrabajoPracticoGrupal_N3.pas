@@ -486,23 +486,25 @@ end;
 
 
 Procedure Sintomas;     //CARGA DE SINTOMAS
-var i:integer;
+var a:boolean;
 begin
 clrscr;
+a:=true;
     if (acum_sint=cant_sint) then writeln('La base de datos esta llena');
 
-    for i:= acum_sint+1 to cant_sint do
+    while (not(acum_sint=cant_sint))and(not eof(ASint)) and (a) do
         begin
-            cod_sint[i]:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',cod_sint);
-            desc_sint[i]:=string_valido('Ingrese el nombre del sintoma: ',1,30);
-            acum_sint:=acum_sint+1;
+        write('uwu');
+            //cod_sint[1]:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',cod_sint);
+            //desc_sint[1]:=string_valido('Ingrese el nombre del sintoma: ',1,30);
+            //acum_sint:=acum_sint+1;
 
             if acum_sint<cant_sint then
                 begin
                 if (opcion_binaria('Desea ingresar otro sintoma? (S/N) ','S','N','MAY') = 'N') then
-                    i:=cant_sint;
+                    a:=false;
                 end
-            else writeln('NO podes ingresar mas sintomas');
+            else writeln('No se pueden ingresar mas sintomas');
 
             writeln;
         end;
