@@ -26,12 +26,12 @@ null=char(0)+char(0)+char(0);
 //Types------------------------------------------------------------------------------
 
 Type
-//cod=array [1..cant_provincias] of char;
-//desc=array [1..cant_provincias] of string[20];
-//cod_sintomas=array [1..cant_sint] of string[3];
-//desc_sintomas=array [1..cant_sint] of string[30];
-//cod_enfermedades=array [1..cant_enf] of string[3];
-//desc_enfermedades=array [1..cant_enf] of string[30];
+cod=array [1..cant_provincias] of char;
+desc=array [1..cant_provincias] of string[20];
+cod_sintomas=array [1..cant_sint] of string[3];
+desc_sintomas=array [1..cant_sint] of string[30];
+cod_enfermedades=array [1..cant_enf] of string[3];
+desc_enfermedades=array [1..cant_enf] of string[30];
 matriz=array[1..cant_enf,1..max_sint]of string[3];
 sintenf = array [1..max_sint] of string[3];
 
