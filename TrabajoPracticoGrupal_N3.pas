@@ -527,6 +527,7 @@ end;
 //PROGRAMA PRINCIPAL-----------------------------------------------------------------------------
 
 BEGIN
+boot;
     //Inicializacion de vairaibles
     acum_sint:=0;
     acum_enf:=0;
