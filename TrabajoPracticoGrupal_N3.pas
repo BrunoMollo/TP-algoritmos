@@ -103,12 +103,20 @@ begin
     rep_sint:=False;
     reset(ASint);
 
-    while not eof(ASint) do
+    while not eof(ASint) and not(rep_sint) do
     begin
     read(ASint,aux);
        case campo of
-            1:if reg.cod=aux.cod then rep_sint:=True;
-            2:if reg.desc=aux.desc then rep_sint:=True;
+            1:if reg.cod=aux.cod then
+                                 begin
+                                 writeln('Codigo ya ingresado');
+                                 rep_sint:=True;
+                                 end;
+            2:if reg.desc=aux.desc then
+                                   begin
+                                   writeln('Nombre ya ingresado');
+                                   rep_sint:=True;
+                                   end;
        end;
     end;
 end;
@@ -519,7 +527,7 @@ Procedure Sintomas;     //CARGA DE SINTOMAS
 var
 a:boolean;
 i:integer;
-
+x:unSintoma;
 begin
 clrscr;
 a:=true;
@@ -540,8 +548,15 @@ if (filesize(ASint)=cant_sint) then writeln('La base de datos esta llena');
     while (not(filesize(ASint)=cant_sint)) and (a) do
         begin
             seek(ASint,filesize(ASint));
-            S.cod:=string_num_valido('Ingrese el codigo del sintoma: ',1,3);
-            S.desc:=string_valido('Ingrese el nombre del sintoma: ', 1,20);
+
+            repeat
+            X.cod:=string_num_valido('Ingrese el codigo del sintoma: ',1,3);
+            until not(rep_sint(X,1));
+            S.cod:=x.cod;
+            repeat
+            X.desc:=string_valido('Ingrese el nombre del sintoma: ', 1,20);
+            until not(rep_sint(X,2));
+            S.desc:=x.desc;
             seek(ASint,filepos(ASint));
             write(ASint,S);
 
@@ -597,6 +612,7 @@ end;
 //PROGRAMA PRINCIPAL-----------------------------------------------------------------------------
 
 BEGIN
+boot;
     //Inicializacion de vairaibles
     acum_sint:=0;
     acum_enf:=0;
