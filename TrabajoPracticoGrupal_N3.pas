@@ -1,4 +1,3 @@
-//berenjena
 Program TrabajoPracticoGrupal_V2;
 //******************************************//
 //****      Alumnos:                    ****///
@@ -280,7 +279,6 @@ assign(Enfermedades,'C:/TP3/Enfermedades.dat');
 assign(Sintomas,'C:/TP3/Sintomas.dat');
 assign(Pacientes,'C:/TP3/Pacientes.dat');
 assign(Historias,'C:/TP3/Historias.dat');
-end;
 
 
 
