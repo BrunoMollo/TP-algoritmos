@@ -1,4 +1,6 @@
-
+{
+TODOS SE LA COMEN
+}
 Program TrabajoPracticoGrupal_V2;
 //******************************************//
 //****      Alumnos:                    ****///
