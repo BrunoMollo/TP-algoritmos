@@ -64,10 +64,6 @@ unaHistoria = record
             efector:string[30];
             end;
 
-
-
-
-
 //Variables globales------------------------------------------------------------------------------
 
 VAR
@@ -107,12 +103,20 @@ begin
     rep_sint:=False;
     reset(ASint);
 
-    while not eof(ASint) do
+    while not eof(ASint) and not(rep_sint) do
     begin
     read(ASint,aux);
        case campo of
-            1:if reg.cod=aux.cod then rep_sint:=True;
-            2:if reg.desc=aux.desc then rep_sint:=True;
+            1:if reg.cod=aux.cod then
+                                 begin
+                                 writeln('Codigo ya ingresado');
+                                 rep_sint:=True;
+                                 end;
+            2:if reg.desc=aux.desc then
+                                   begin
+                                   writeln('Nombre ya ingresado');
+                                   rep_sint:=True;
+                                   end;
        end;
     end;
 end;
@@ -338,7 +342,14 @@ close(APac);
 close(AHist);
 end;
 
-
+Procedure borramela;
+begin
+Rewrite(AProv);
+Rewrite(ASint);
+Rewrite(AEnf);
+Rewrite(APac);
+Rewrite(AHist);
+end;
 
 Procedure ordenar_provincias(c:cod; d:desc; modo:integer);        //MUESTRA LAS PROVINICIAS ORDENADAS,
 var                                                               //MODO=1 -->ORDENA POR CODIGO  ;  MODO=2 -->ORDENA POR NOMBRE
@@ -513,23 +524,48 @@ end;
 
 
 Procedure Sintomas;     //CARGA DE SINTOMAS
-var i:integer;
+var
+a:boolean;
+i:integer;
+x:unSintoma;
 begin
 clrscr;
-    if (acum_sint=cant_sint) then writeln('La base de datos esta llena');
+a:=true;
+if filesize(ASint)<>0 then
+   begin
+   reset(ASint);
+   Writeln('Sintomas previamente ingresados: ');
+   while not eof(ASint) do
+         begin
+         read(ASint,S);
+         writeln(S.cod,'  ',S.desc);
+         end;
+   writeln('---------------------------------------');
+   end;
 
-    for i:= acum_sint+1 to cant_sint do
+if (filesize(ASint)=cant_sint) then writeln('La base de datos esta llena');
+
+    while (not(filesize(ASint)=cant_sint)) and (a) do
         begin
-            cod_sint[i]:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',cod_sint);
-            desc_sint[i]:=string_valido('Ingrese el nombre del sintoma: ',1,30);
-            acum_sint:=acum_sint+1;
+            seek(ASint,filesize(ASint));
 
-            if acum_sint<cant_sint then
+            repeat
+            X.cod:=string_num_valido('Ingrese el codigo del sintoma: ',1,3);
+            until not(rep_sint(X,1));
+            S.cod:=x.cod;
+            repeat
+            X.desc:=string_valido('Ingrese el nombre del sintoma: ', 1,20);
+            until not(rep_sint(X,2));
+            S.desc:=x.desc;
+            seek(ASint,filepos(ASint));
+            write(ASint,S);
+
+            if filesize(ASint)<cant_sint then
                 begin
                 if (opcion_binaria('Desea ingresar otro sintoma? (S/N) ','S','N','MAY') = 'N') then
-                    i:=cant_sint;
+                    a:=false;
                 end
-            else writeln('NO podes ingresar mas sintomas');
+            else writeln('No se pueden ingresar mas sintomas');
 
             writeln;
         end;
@@ -538,7 +574,7 @@ end;
 
 
 
-Procedure Provincias;        //CARGA DE PROVINCIAS
+Procedure Provincias;       //CARGA DE PROVINCIAS
 var
 acum,i:integer;
 begin
@@ -576,6 +612,7 @@ end;
 //PROGRAMA PRINCIPAL-----------------------------------------------------------------------------
 
 BEGIN
+boot;
     //Inicializacion de vairaibles
     acum_sint:=0;
     acum_enf:=0;
@@ -595,8 +632,9 @@ BEGIN
             writeln('4) Pacientes');
             writeln('5) Historias Clinicas');
             writeln('6) Estadisticas');
+            writeln('7) Borrar datos');
             writeln('0) Fin del Programa');textcolor(7);
-            Opcion:=int_valido('Ingrese la opcion: ',0,6);
+            Opcion:=int_valido('Ingrese la opcion: ',0,7);
             Case Opcion of
             1: Provincias;
             2: Sintomas;
@@ -604,6 +642,7 @@ BEGIN
             4: Pacientes;
             5: writeln('En construccion');
             6: writeln('En construccion');
+            7: Borramela;
             0: begin
                Andando:=False;
                shutdown;
