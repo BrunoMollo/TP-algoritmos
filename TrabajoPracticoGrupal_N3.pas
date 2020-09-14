@@ -109,7 +109,7 @@ begin
        case campo of
             1:if reg.cod=aux.cod then
                                  begin
-                                 writeln('Codigo ya ingresado');
+                                 writeln('Codigo existente');
                                  rep_sint:=True;
                                  end;
             2:if reg.desc=aux.desc then
@@ -399,63 +399,70 @@ end;
 
 
 
-Procedure cargar_sint_de_enf(num_enf:integer);
+Procedure sint_enf();
 var
 i:integer;
-existe:boolean;
+standby:unSintoma;
+
 begin
-    for i:= 1 to max_sint do
-            begin
-                repeat
-                matriz_sintomas[num_enf,i]:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',matriz_sintomas[num_enf]);
-                existe:=is_in_array(cod_sint,matriz_sintomas[num_enf,i]);
-                if existe=false then
-                    writeln('El codigo ingresado no existe');
-                until existe = true;
+//while not eof(ASint) and (a) do
+//      begin
+        seek(AEnf,filepos(AEnf));
+        for i:= 1 to max_sint do
+        begin
+             repeat
+             standby.cod:=string_valido('Ingrese el codigo del sintoma: ',1,3);
+             until rep_sint(standby,1);
 
-                if (i=acum_sint) then
-                    begin
-                        writeln('No hay mas sintomas');
-                        i:=max_sint; //sale del repeat
-                    end;
+             E.sintomas[i]:=standby.cod;
 
-                if (i<max_sint) then
+             if (i<max_sint) then
                 begin
-                    if opcion_binaria('Desea ingresar otro sintoma? (S/N) ','S','N','MAY')= 'N' then
-                    i:=max_sint;//sale del repeat
+                if opcion_binaria('Desea ingresar otro sintoma? (S/N) ','S','N','MAY')= 'N' then
+                i:=max_sint;//sale del repeat
                 end;
-            end;
-
+        end;
+//      end;
 end;
 
 
-Procedure Mostrar_sintomas;   //Este procedure ese para el chapin enfermedades
+{Procedure Mostrar_sintomas;   //Este procedure ese para el chapin enfermedades
 var i,j,k,acum:integer;
 begin
-    for i:= 1 to cant_sint do
-        begin
-            if cod_sint[i]<>null then
-            begin
-                writeln('El sintoma con el codigo ',cod_sint[i],' es ',desc_sint[i]);
-                acum:=0;
-                for j:= 1 to cant_enf do
-                begin
-                    for k:= 1 to high(matriz_sintomas[j]) do
-                    begin
-                        if (matriz_sintomas[j,k] = cod_sint[i]) then acum:=acum+1;
-                    end;
-                end;
-                writeln('Las enfermedades que la presentan son: ',acum);
-            end;
-        end;
+reset(ASint);
+reset(AEnf);
+while not eof(ASint) do
+      begin
+      read(Asint,S);
+      writeln('El sintoma con el codigo ',S.cod,' es ',S.desc);
+      acum:=0;
+      while not eof(AEnf)do
+          begin
+              read(AEnf,E);
+              for i:= 1 to max_sint do
+              if (E.sintomas[i]=S.cod) then acum:=acum+1;
+          end;
+          writeln('Las enfermedades que la presentan son: ',acum);
+      end;
+end; }
 
+Procedure Mostrar_enfermedades;   //Este procedure ese para el chapin enfermedades
+begin
+reset(AEnf);
+writeln('Enfermedades previamente cargadas: ');
+while not eof(AEnf) do
+      begin
+      read(AEnf,E);
+      writeln(E.cod,'  ',E.desc);
+      end;
+writeln('---------------------------------------');
 end;
 
 
 //MODULOS----------------------------------------------------------------------
 
 
-Procedure Pacientes;        //INGRESO DE PACIENTES
+Procedure Pacient;        //INGRESO DE PACIENTES
 var
 DNI,DNImirta:string[8];
 edad,sanos,edadrecord:integer;
@@ -493,33 +500,38 @@ end;
 
 
 
-Procedure Enfermedades;         //BUSQUEDA DE ENFERMEDADES
+Procedure Enfermedades;         //BUSQUEDA DE ENFERMEDADES //falta validar codigos y nombres
 var
-i:integer;
+a:boolean;
 begin
+a:=true;
 clrscr;
-   for i:=acum_enf+1 to cant_enf do        //ACA CARGAMOS LAS ENFERMEDADES
-    begin
-        cod_enf[i]:=cod_str_no_repetido('Ingrese el codigo de la enfermedad: ',cod_enf);
-        desc_enf[i]:=string_valido('Ingrese el nombre de la enfermedad: ',1,30);
-        acum_enf:=acum_enf+1;
 
-        cargar_sint_de_enf(i);//cargamos los sintomas de la enfermedad numero i
+Mostrar_enfermedades;
+seek(AEnf,filesize(AEnf));
+while not eof(ASint) and  (a) do      //ACA CARGAMOS LAS ENFERMEDADES
+      begin
+      E.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
+      E.desc:=string_valido('Ingrese el nombre de la enfermedad: ',1,30);
 
+      sint_enf;//cargamos los sintomas de la enfermedad numero i
 
-        //Preguntamos si quiere ingresar otra enfermedad
-        if (i=cant_enf) then writeln('La base de datos esta llena') else
-            if opcion_binaria('Desea ingresar otra enfermedad? (S/N) ','S','N','MAY')= 'N' then
-                i:=cant_enf;
-        writeln;
-    end;
-
-
-    Mostrar_sintomas;
-
-
-
+      write(AEnf,E);
+      //Preguntamos si quiere ingresar otra enfermedad
+      if (filepos(AEnf)=cant_enf) then
+         writeln('La base de datos esta llena')
+      else
+          if opcion_binaria('Desea ingresar otra enfermedad? (S/N) ','S','N','MAY')= 'N' then
+             a:=false;
+      end;
+writeln;
 end;
+
+
+
+
+
+
 
 
 
@@ -550,7 +562,7 @@ if (filesize(ASint)=cant_sint) then writeln('La base de datos esta llena');
             seek(ASint,filesize(ASint));
 
             repeat
-            X.cod:=string_num_valido('Ingrese el codigo del sintoma: ',1,3);
+            X.cod:=string_valido('Ingrese el codigo del sintoma: ',1,3);
             until not(rep_sint(X,1));
             S.cod:=x.cod;
             repeat
@@ -638,8 +650,8 @@ boot;
             Case Opcion of
             1: Provincias;
             2: Sintomas;
-            3: if (acum_sint>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
-            4: Pacientes;
+            3: if (filesize(ASint)<>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
+            4: Pacient;
             5: writeln('En construccion');
             6: writeln('En construccion');
             7: Borramela;
