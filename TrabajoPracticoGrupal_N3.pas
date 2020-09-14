@@ -400,7 +400,8 @@ end;
 
 
 Procedure sint_enf();
-var
+var                                     //ver si hay alguna funcion que me sirva para revisar el array de sintomas
+                                        //cod_str_no_repetido?
 i:integer;
 standby:unSintoma;
 
