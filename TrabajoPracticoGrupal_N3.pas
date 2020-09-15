@@ -692,10 +692,103 @@ if (filesize(ASint)=cant_sint) then writeln('La base de datos esta llena');
         end;
 
 end;
+//-----------------------------------------------------------------------------------
+Procedure Ordenar1;
+var i,j:integer;
+PI,PJ:unaProvincia;
+begin
+    reset(AProv);
+    for i:= 0 to filesize(AProv)-2 do
+        for j:= i+1 to filesize(AProv)-1 do
+            begin
+                seek(AProv,i);
+                read(AProv,PI);
+                seek(AProv,j);
+                read(AProv,PJ);
+                if (PI.cod > PJ.cod) then
+                    begin
+                        seek(AProv,i);
+                        write(AProv,PJ);
+                        seek(AProv,j);
+                        write(AProv,PI);
+                    end;
+            end;
+    reset(AProv);
+    for i:= 1 to filesize(AProv) do
+        begin
+            read(AProv,P);
+            writeln(P.cod,'  ','-','  ',P.desc);
+        end;
+end;
+
+Procedure Ordenar2;
+var i,j:integer;
+PI,PJ:unaProvincia;
+begin
+    reset(AProv);
+    for i:= 0 to filesize(AProv)-2 do
+        for j:= i+1 to filesize(AProv)-1 do
+            begin
+                seek(AProv,i);
+                read(AProv,PI);
+                seek(AProv,j);
+                read(AProv,PJ);
+                if (PI.desc > PJ.desc) then
+                    begin
+                        seek(AProv,i);
+                        write(AProv,PJ);
+                        seek(AProv,j);
+                        write(AProv,PI);
+                    end;
+            end;
+    reset(AProv);
+    for i:= 1 to filesize(AProv) do
+        begin
+            read(AProv,P);
+            writeln(P.cod,'  ','-','  ',P.desc);
+        end;
+end;
 
 
+//PROVINCIAS FINAL?
+Procedure Provincias;
+var i:integer;
+begin                           //CARGA DE PROVINCIAS
+    reset(AProv);
+    If not (filesize(AProv) = cant_provincias) then
+    begin
+        write('Ingrese los datos de las provincias');
+        writeln();writeln();
+        for i:= 1 to cant_provincias do
+            begin
+                repeat
+                    P.cod:=char_valido('Codigo de la Provincia: ','A','Z','MAY');
+                until not rep_prov(P,1);
+                repeat
+                    write('Nombre de la Provincia: ');
+                    readln(P.desc);
+                    P.desc:=Uppercase(P.desc);
+                until not rep_prov(P,2);
+                write(AProv,P);
+            end;
+    end
+    else write('Las provincias ya fueron cargadas...');
 
-Procedure Provincias;       //CARGA DE PROVINCIAS
+
+reset(AProv);
+    writeln();
+//    write('La cantidad de provincias que empiezan con la letra S es de: ',);   //ACA VA LA FUNCION QUE BUSCA LA LETRA
+    writeln();writeln();
+    writeln('Codigo de provincias ordenado alfabeticamente');
+    Ordenar1;
+    writeln();
+    writeln('Provincias ordenadas alfabeticamente');
+    Ordenar2;
+
+
+end;
+//-----------------------------------------------------------------------------------
+{Procedure Provincias;       //CARGA DE PROVINCIAS
 var
 acum,i:integer;
 begin
@@ -729,7 +822,7 @@ clrscr;
 
 end;
 
-
+}
 //PROGRAMA PRINCIPAL-----------------------------------------------------------------------------
 
 BEGIN
