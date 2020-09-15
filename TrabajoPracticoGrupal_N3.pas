@@ -135,12 +135,12 @@ begin
        case campo of
             1:if reg.cod=aux.cod then
                                  begin
-                                 writeln('Codigo ya ingresado');
+                                 //writeln('Codigo ya ingresado');
                                  rep_prov:=True;
                                  end;
             2:if reg.desc=aux.desc then
                                    begin
-                                   writeln('Nombre ya ingresado');
+                                   //writeln('Nombre ya ingresado');
                                    rep_prov:=True;
                                    end;
        end;
@@ -520,17 +520,31 @@ begin
 
 end;
 
+Function PromEdades:real; //calcula el promedio de edad de TODOS los pacientes;
+var suma:real;
+    pacAux:unpaciente;
+begin
+    reset(APac);
+    suma:=0;
+    while not eof(Apac) do
+    begin
+        read(Apac,pacAux);
+        suma:=suma+pacAux.edad;
+    end;
+    promEdades:=suma/filesize(APac);
+end;
 
 
 
-Procedure Pacientes;        //INGRESO DE PACIENTES {Bocha de cosas hay qeu borrar aca}
+
+Procedure Pacientes;        //INGRESO DE PACIENTES
 var
 fiambre,mirta:unpaciente;
+auxprov:unaprovincia;
 
-{DNI,DNImirta:string[8];}
-{edad,sanos,edadrecord:integer;}
-{sumaedades,cantpacientes:real;}
-{curado,reset:char;}
+
+{sanos:integer;}
+{curado:char;}
 begin
 clrscr;
     //El mas viejo va a estar primero, entonces lo bajo
@@ -540,10 +554,7 @@ clrscr;
 
 
 
-    {edadrecord:=0;
-    cantpacientes:=0;
-    sumaedades:=0;
-    sanos:=0; }
+    {sanos:=0; }
 
     repeat
         writeln;
@@ -555,7 +566,12 @@ clrscr;
 
         fiambre.edad:=int_valido('Ingrese la edad del paciente: ',0,125);
 
-        fiambre.cod_prov:=char_valido('Ingrese codigo de provincia: ','A','Z','MAY');//Hay que validar esta cosa?????
+        repeat
+            auxprov.cod:=char_valido('Ingrese codigo de provincia: ','A','Z','MAY');
+            fiambre.cod_prov:=auxprov.cod;
+            if not rep_prov(auxprov,1) then writeln('Esa provincia no existe');
+        until rep_prov(auxprov,1);
+
         fiambre.cant_enf:=0;//Empieza en cero, no???
         fiambre.dead:=opcion_binaria('Esta vivo o Muerto? (M/V) ','M','V','MAY');//hay que preguntar esto o va vivo por defecto????
 
@@ -600,13 +616,10 @@ clrscr;
         end;
 
 
-        {sumaedades:=sumaedades+edad;     //Si vamos a calclar el promedio supongo que va a ser de una manera menos rudimentaria
-        cantpacientes:=cantpacientes+1;}
-
     until opcion_binaria('Desea ingresar otro paciente? (S/N) ','S','N','MAY')='N';
 
-
-    //writeln('El promedio de edades de todos los pacientes atendidos es de: ',sumaedades/cantpacientes:6:2);
+    Writeln;Writeln;
+    writeln('El promedio de edades de todos los pacientes atendidos es de: ',PromEdades:6:2);
     //writeln('La cantidad de pacientes curados es de: ',sanos);
     writeln('El paciente de mayor edad afectado tiene ',mirta.edad,' y su DNI es ',mirta.dni);
 end;
@@ -763,11 +776,12 @@ begin                           //CARGA DE PROVINCIAS
             begin
                 repeat
                     P.cod:=char_valido('Codigo de la Provincia: ','A','Z','MAY');
+                    if rep_prov(P,1) then writeln('Ya ingresaste ese codigo');
                 until not rep_prov(P,1);
                 repeat
-                    write('Nombre de la Provincia: ');
-                    readln(P.desc);
+                    P.desc:=string_valido('Nombre de la provincia: ',1,20);
                     P.desc:=Uppercase(P.desc);
+                    if rep_prov(P,2) then writeln('Ya ingresaste ese nombre');
                 until not rep_prov(P,2);
                 write(AProv,P);
             end;
@@ -853,7 +867,7 @@ boot;
             1: Provincias;
             2: Sintomas;
             3: if (acum_sint>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
-            4: Pacientes;
+            4: if (filesize(AProv)>0)then Pacientes else writeln('Primero vas a tener que  cargar las provincias');
             5: writeln('En construccion');
             6: writeln('En construccion');
             7: Borramela;
