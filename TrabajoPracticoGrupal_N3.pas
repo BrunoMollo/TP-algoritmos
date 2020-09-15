@@ -109,15 +109,9 @@ begin
     read(ASint,aux);
        case campo of
             1:if reg.cod=aux.cod then
-                                 begin
-                                 writeln('Codigo existente');
                                  rep_sint:=True;
-                                 end;
             2:if reg.desc=aux.desc then
-                                   begin
-                                   writeln('Nombre ya ingresado');
                                    rep_sint:=True;
-                                   end;
        end;
     end;
 end;
@@ -134,16 +128,10 @@ begin
     read(Aenf,aux);
        case campo of
             1:if reg.cod=aux.cod then
-                                 begin
-                                 writeln('Codigo ya ingresado');
                                  rep_enf:=True;
-                                 end;
             2:if reg.desc=aux.desc then
-                                   begin
-                                   writeln('Nombre ya ingresado');
                                    rep_enf:=True;
-                                   end;
-       end;
+            end;
     end;
 end;
 
@@ -428,31 +416,33 @@ end;
 Procedure sint_enf(var reg:unaEnfermedad);
 var                                     //ver si hay alguna funcion que me sirva para revisar el array de sintomas
                                         //cod_str_no_repetido?
-i:integer;
+i,cont:integer;
 auxiliar:string[3];
+dea:unSintoma;
 
 begin
-//while not eof(ASint) and (a) do                    E.sintomas = array [1..max_sint=6]  of string[3]
+//                  E.sintomas = array [1..max_sint=6]  of string[3]
 //      begin
-        seek(AEnf,filepos(AEnf));
-//        limpiar_str3(AEnf.sintomas);
+//        seek(AEnf,filepos(AEnf));
+       limpiar_str3(reg.sintomas);
         for i:= 1 to max_sint do
         begin
              repeat
-             write('Ingrese el codigo del sintoma: ');
-             readln(auxiliar);
-             reg.sintomas[i]:=cod_str_no_repetido(auxiliar,reg.sintomas);
-             until rep_sint(reg,1);
+             dea.cod:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',reg.sintomas);
 
-//             E.sintomas[i]:=standby.cod;
 
+             if not rep_sint(dea,1) then writeln('Codigo no existente');
+             until rep_sint(dea,1);
+             reg.sintomas[i]:=dea.cod;
+
+             if i=filesize(ASint) then i:=max_sint;
              if (i<max_sint) then
                 begin
-                if opcion_binaria('Desea ingresar otro sintoma? (S/N) ','S','N','MAY')= 'N' then
+                if opcion_binaria('Desea ingresar otro sintoma? (S/N) ','S','N','MAY')= 'N'then
                 i:=max_sint;//sale del repeat
                 end;
         end;
-//      end;
+writeln(' ');
 end;
 
 
@@ -478,23 +468,24 @@ end; }
 
 Procedure Mostrar_enfermedades;   //Este procedure ese para el chapin enfermedades
 begin
-reset(AEnf);
-writeln('Enfermedades previamente cargadas: ');
-while not eof(AEnf) do
-      begin
-      read(AEnf,E);
-      writeln(E.cod,'  ',E.desc);
-      end;
-writeln('---------------------------------------');
-end;
 
+if filesize(AEnf)<>0 then
+   begin
+   reset(AEnf);
+   Writeln('Enfermedades previamente ingresadas: ');
+   while not eof(AEnf) do
+         begin
+         read(AEnf,E);
+         writeln(E.cod,'  ',E.desc);
+         end;
+   writeln('---------------------------------------');
+   end;
+end;
 
 //MODULOS----------------------------------------------------------------------
 
 
-<<<<<<< HEAD
-Procedure Pacient;        //INGRESO DE PACIENTES
-=======
+
 Function ExisteDNI(mi_dni:string[8]):boolean;
 var fiambre:unpaciente;
 begin
@@ -512,7 +503,7 @@ end;
 
 
 Procedure Pacientes;        //INGRESO DE PACIENTES {Bocha de cosas hay qeu borrar aca}
->>>>>>> master
+
 var
 fiambre,mirta:unpaciente;
 
@@ -603,29 +594,40 @@ end;
 
 
 
-Procedure Enfermedades;         //BUSQUEDA DE ENFERMEDADES //falta validar codigos y nombres
+Procedure Enfermedades;         //BUSQUEDA DE ENFERMEDADES    //falta validar codigos y nombres
 var
 a:boolean;
+x:unaEnfermedad;
 begin
 a:=true;
 clrscr;
-
+reset(AEnf);
 Mostrar_enfermedades;
 seek(AEnf,filesize(AEnf));
-while not eof(ASint) and  (a) do      //ACA CARGAMOS LAS ENFERMEDADES
+
+while (a) do      //ACA CARGAMOS LAS ENFERMEDADES
       begin
-      E.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
-      E.desc:=string_valido('Ingrese el nombre de la enfermedad: ',1,30);
+           seek(AEnf,filesize(AEnf));
+           repeat
+           x.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
+           until not(rep_enf(x,1));
+           E.cod:=x.cod;
 
-      sint_enf(E);//cargamos los sintomas de la enfermedad numero i
+           repeat
+           x.desc:=string_valido('Ingrese el nombre de la enfermedad: ',1,30);
+           until not(rep_enf(x,2));
+           E.desc:=X.desc;
 
-      write(AEnf,E);
-      //Preguntamos si quiere ingresar otra enfermedad
-      if (filepos(AEnf)=cant_enf) then
-         writeln('La base de datos esta llena')
-      else
-          if opcion_binaria('Desea ingresar otra enfermedad? (S/N) ','S','N','MAY')= 'N' then
-             a:=false;
+         sint_enf(E);//cargamos los sintomas de la enfermedad e
+
+           write(AEnf,E);
+//         Preguntamos si quiere ingresar otra enfermedad
+           if (filesize(AEnf)=cant_enf) then
+              writeln('La base de datos esta llena')
+           else
+               if opcion_binaria('Desea ingresar otra enfermedad? (S/N) ','S','N','MAY')= 'N' then
+                  a:=false;
+
       end;
 writeln;
 end;
@@ -666,10 +668,12 @@ if (filesize(ASint)=cant_sint) then writeln('La base de datos esta llena');
 
             repeat
             X.cod:=string_valido('Ingrese el codigo del sintoma: ',1,3);
+            if rep_sint(X,1) then writeln('Codigo ya existente');
             until not(rep_sint(X,1));
             S.cod:=x.cod;
             repeat
             X.desc:=string_valido('Ingrese el nombre del sintoma: ', 1,20);
+            if rep_sint(X,2) then writeln('Nombre ya existente');
             until not(rep_sint(X,2));
             S.desc:=x.desc;
             seek(ASint,filepos(ASint));
@@ -754,7 +758,7 @@ boot;
             1: Provincias;
             2: Sintomas;
             3: if (filesize(ASint)<>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
-            4: Pacient;
+            4: Pacientes;
             5: writeln('En construccion');
             6: writeln('En construccion');
             7: Borramela;
