@@ -18,6 +18,7 @@ cant_provincias=2;
 cant_sint=20;
 cant_enf=10;
 max_sint=6;
+sint_por_historia=2;
 null=char(0)+char(0)+char(0);
 
 
@@ -32,7 +33,7 @@ desc_sintomas=array [1..cant_sint] of string[30];
 cod_enfermedades=array [1..cant_enf] of string[3];
 desc_enfermedades=array [1..cant_enf] of string[30];
 matriz=array[1..cant_enf,1..max_sint]of string[3];
-sintenf = array [1..max_sint] of string[3];
+
 
 
 unaProvincia = record
@@ -46,7 +47,7 @@ unSintoma = record
 unaEnfermedad = record
               cod:string[3];
               desc:string[20];
-              sintomas:sintenf;
+              sintomas:array [1..max_sint] of string[3];
               end;
 unPaciente = record
            DNI:string[8];
@@ -57,10 +58,10 @@ unPaciente = record
            end;
 unaHistoria = record
             DNI:string[8];
-            cod:string[3];
+            cod_enf:string[3];
             curado:char;
-           // fecha-ingreso:?;
-           // sintomas:array [1..?] of string[3];
+            fecha_ingreso:TdateTime;
+            sintomas:array [1..sint_por_historia] of string[3];
             efector:string[30];
             end;
 
@@ -97,6 +98,14 @@ acum_enf:integer;
 
 
 //Funciones------------------------------------------------------------------------------
+
+Function date_to_str(date:TdateTime):string;
+Var YY,MM,DD : Word;
+begin
+ DeCodeDate (Date,YY,MM,DD);
+ date_to_str:=(format ('%d/%d/%d ',[dd,mm,yy]));
+end;
+
 
 Function rep_sint(reg:unsintoma;campo:integer):boolean; //ingresa un registro de sintoma y el numeor del campo que qeures chequar (1:cod, 2:desc)
 var aux:unsintoma;                                      //Te va a tirar un true si esta repetido el campo, si nada se repita va un false
@@ -155,6 +164,22 @@ begin
                                  rep_enf:=True;
             2:if reg.desc=aux.desc then
                                    rep_enf:=True;
+            end;
+    end;
+end;
+
+Function rep_pac(reg:unpaciente;campo:integer):boolean; //ingresa un registro de paciente y el numeor del campo que qeures chequar (1:cod, 2:desc)
+var aux:unpaciente;                                      //Te va a tirar un true si esta repetido el campo, si nada se repita va un false
+begin
+    rep_pac:=False;
+    reset(Apac);
+
+    while not eof(Apac) and not(rep_pac) do
+    begin
+    read(Apac,aux);
+       case campo of
+            1:if reg.dni=aux.dni then
+                                 rep_pac:=True;
             end;
     end;
 end;
@@ -437,7 +462,7 @@ end;
 
 
 
-Procedure sint_enf(var reg:unaEnfermedad);
+Procedure sint_enf(var arr:array of string[3]);//capas que tendraimos que cambairle el nombre a este procedure, ahora se usa en hiitorias tmb
 var                                     //ver si hay alguna funcion que me sirva para revisar el array de sintomas
                                         //cod_str_no_repetido?
 i,cont:integer;
@@ -448,25 +473,25 @@ begin
 //                  E.sintomas = array [1..max_sint=6]  of string[3]
 //      begin
 //        seek(AEnf,filepos(AEnf));
-       limpiar_str3(reg.sintomas);
-        for i:= 1 to max_sint do
+       limpiar_str3(arr);
+        for i:= low(arr) to high(arr) do
         begin
              repeat
-                dea.cod:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',reg.sintomas);
-
+                dea.cod:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',arr);
                 if not rep_sint(dea,1) then writeln('Codigo no existente');
              until rep_sint(dea,1);
-             reg.sintomas[i]:=dea.cod;
+             arr[i]:=dea.cod;
 
-             if i=filesize(ASint) then
+             if i=high(arr) then writeln('NO se pueden registrar mas de ',i+1,' sintomas');
+             if i=filesize(ASint)-1  then
              begin
-                i:=max_sint;
+                i:=high(arr);
                 writeln('NO hay mas sintomas para cargar');
              end
-             else if (i<max_sint) then
+             else if (i<high(arr)) then
                 begin
                 if opcion_binaria('Desea ingresar otro sintoma? (S/N) ','S','N','MAY')= 'N'then
-                i:=max_sint;//sale del repeat
+                i:=high(arr);//sale del repeat
                 end;
         end;
 writeln(' ');
@@ -512,7 +537,7 @@ end;
 //MODULOS----------------------------------------------------------------------
 
 
-
+{
 Function ExisteDNI(mi_dni:string[8]):boolean;
 var fiambre:unpaciente;
 begin
@@ -524,7 +549,7 @@ begin
         if fiambre.dni=mi_dni then ExisteDNI:=True;
     end;
 
-end;
+end;}
 
 Function PromEdades:real; //calcula el promedio de edad de TODOS los pacientes;
 var suma:real;
@@ -569,8 +594,8 @@ clrscr;
         //Chequeo que no haya dni repetido
         repeat
             fiambre.dni:=string_num_valido('Ingrese el numero del DNI: ',1,8);
-            if ExisteDNI(fiambre.dni) then writeln('Ya ingresaron ese DNI');
-        until not ExisteDNI(fiambre.dni);
+            if rep_pac(fiambre,1) then writeln('Ya ingresaron ese DNI');
+        until not rep_pac(fiambre,1);
 
         fiambre.edad:=int_valido('Ingrese la edad del paciente: ',0,125);
 
@@ -650,16 +675,18 @@ while (a) do      //ACA CARGAMOS LAS ENFERMEDADES
       begin
            seek(AEnf,filesize(AEnf));
            repeat
-           x.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
+                x.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
+                if rep_enf(x,1) then writeln('Ya se cargo ese codigo');
            until not(rep_enf(x,1));
            E.cod:=x.cod;
 
            repeat
-           x.desc:=string_valido('Ingrese el nombre de la enfermedad: ',1,30);
+                x.desc:=string_valido('Ingrese el nombre de la enfermedad: ',1,30);
+                if rep_enf(x,2) then writeln('Ya hay un aenfermedad con ese nombre');
            until not(rep_enf(x,2));
            E.desc:=X.desc;
 
-         sint_enf(E);//cargamos los sintomas de la enfermedad e
+         sint_enf(E.sintomas);//cargamos los sintomas de la enfermedad e
 
            write(AEnf,E);
 //         Preguntamos si quiere ingresar otra enfermedad
@@ -863,8 +890,89 @@ clrscr;
 end;
 
 }
-//PROGRAMA PRINCIPAL-----------------------------------------------------------------------------
 
+function nomb_sint(cod:string[3]):string;  //le das un codigo y devuelve el nombre del sintoma en cuestion
+var mi_sint:unSintoma;
+begin
+    reset(Asint);
+    nomb_sint:='/nombre_no_encontrado/';
+    repeat
+        read(Asint,mi_sint);
+        if mi_sint.cod=cod then nomb_sint:=mi_sint.desc;
+    until eof(Asint) or (mi_sint.cod=cod);
+end;
+
+Procedure Mostrar_sint(cod:string[3]);
+var mi_enf:unaEnfermedad;
+    i:integer;
+begin
+    reset(Aenf);
+
+    repeat
+        read(Aenf,mi_enf);
+        if mi_enf.cod=cod then
+        begin
+            writeln('Los sintomas de la enfermedad son:');
+            for i:=1 to max_sint do
+            begin
+                if mi_enf.sintomas[i]<>null then writeln('-',nomb_sint(mi_enf.sintomas[i]));
+            end;
+        end;
+
+    until eof(Aenf)or (mi_enf.cod=cod);
+end;
+
+
+
+Procedure historias;
+var auxPac:unpaciente;
+    auxEnf:unaEnfermedad;
+    auxSint:unSintoma;
+    auxHist:unahistoria;
+    csint,i:integer;
+begin
+    clrscr;
+
+    auxPac.dni:=string_num_valido('Ingrese el numero del DNI: ',1,8);
+    if not rep_pac(auxPac,1) then writeln('Ese dni no esta en la base de datos')
+    else
+    begin
+        auxEnf.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
+        if not rep_enf(auxEnf,1) then writeln('Esa enfermedad no existe') else
+            begin
+                auxHist.dni:=auxPac.dni;
+                auxHist.cod_enf:=auxEnf.cod;
+
+                Mostrar_sint(auxHist.cod_enf);
+
+                auxHist.curado:=opcion_binaria('Se ha curado?(S/N): ','S','N','MAY');
+
+                writeln;
+                writeln('Ingresar sintomas que presenta el paciente');
+                sint_enf(auxHist.sintomas);
+
+                auxHist.efector:=string_valido('Nombre del efector: ',1,30);
+
+                auxHist.fecha_ingreso:=date();
+
+                writeln;
+                writeln('Se ha registrado esta histoira clinica con la fecha ',date_to_str(auxHist.fecha_ingreso));
+
+                seek(Ahist,filesize(Ahist));
+                write(Ahist,auxHist);
+            end;
+    end;
+    writeln;
+    if opcion_binaria('Desea ingresar otro historia clinica?(S/N)','S','N','MAY')='S' then historias;
+
+
+end;
+
+
+
+//--------------------------------------------------
+//PROGRAMA PRINCIPAL---------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------
 BEGIN
 boot;
     //Inicializacion de vairaibles
@@ -894,7 +1002,7 @@ boot;
             2: Sintomas;
             3: if (filesize(ASint)<>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
             4: if (filesize(AProv)>0)then Pacientes else writeln('Primero vas a tener que  cargar las provincias');
-            5: writeln('En construccion');
+            5: if (filesize(Apac)>0)and(filesize(Aenf)>0)then historias else writeln('Tiene que haber datos cargados en Pacientes y en Enfermedades');
             6: writeln('En construccion');
             7: Borramela;
             0: begin
