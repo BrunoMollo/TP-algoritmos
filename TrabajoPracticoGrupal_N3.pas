@@ -399,23 +399,26 @@ end;
 
 
 
-Procedure sint_enf();
+Procedure sint_enf(var reg:unaEnfermedad);
 var                                     //ver si hay alguna funcion que me sirva para revisar el array de sintomas
                                         //cod_str_no_repetido?
 i:integer;
-standby:unSintoma;
+auxiliar:string[3];
 
 begin
-//while not eof(ASint) and (a) do
+//while not eof(ASint) and (a) do                    E.sintomas = array [1..max_sint=6]  of string[3]
 //      begin
         seek(AEnf,filepos(AEnf));
+//        limpiar_str3(AEnf.sintomas);
         for i:= 1 to max_sint do
         begin
              repeat
-             standby.cod:=string_valido('Ingrese el codigo del sintoma: ',1,3);
-             until rep_sint(standby,1);
+             write('Ingrese el codigo del sintoma: ');
+             readln(auxiliar);
+             reg.sintomas[i]:=cod_str_no_repetido(auxiliar,reg.sintomas);
+             until rep_sint(reg,1);
 
-             E.sintomas[i]:=standby.cod;
+//             E.sintomas[i]:=standby.cod;
 
              if (i<max_sint) then
                 begin
@@ -515,7 +518,7 @@ while not eof(ASint) and  (a) do      //ACA CARGAMOS LAS ENFERMEDADES
       E.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
       E.desc:=string_valido('Ingrese el nombre de la enfermedad: ',1,30);
 
-      sint_enf;//cargamos los sintomas de la enfermedad numero i
+      sint_enf(E);//cargamos los sintomas de la enfermedad numero i
 
       write(AEnf,E);
       //Preguntamos si quiere ingresar otra enfermedad
