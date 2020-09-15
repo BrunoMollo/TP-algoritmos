@@ -65,7 +65,10 @@ unaHistoria = record
             efector:string[30];
             end;
 
+//-------------------------------------------------
 //Variables globales------------------------------------------------------------------------------
+//-------------------------------------------------
+
 
 VAR
 //Para el menu principal
@@ -96,8 +99,13 @@ AHist:file of unaHistoria;
 acum_sint:integer;
 acum_enf:integer;
 
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//Funciones----------------------------------------------------------------------------------------------------------------------------------------------------------------
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-//Funciones------------------------------------------------------------------------------
+
 
 Function date_to_str(date:TdateTime):string;
 Var YY,MM,DD : Word;
@@ -183,6 +191,101 @@ begin
             end;
     end;
 end;
+
+
+
+
+
+
+
+function nomb_sint(cod:string[3]):string;  //le das un codigo y devuelve el nombre del sintoma en cuestion
+var mi_sint:unSintoma;
+begin
+    reset(Asint);
+    nomb_sint:='/nombre_no_encontrado/';
+    repeat
+        read(Asint,mi_sint);
+        if mi_sint.cod=cod then nomb_sint:=mi_sint.desc;
+    until eof(Asint) or (mi_sint.cod=cod);
+end;
+
+
+Procedure Mostrar_sint(cod:string[3]);
+var mi_enf:unaEnfermedad;
+    i:integer;
+begin
+    reset(Aenf);
+
+    repeat
+        read(Aenf,mi_enf);
+        if mi_enf.cod=cod then
+        begin
+            writeln('Los sintomas de la enfermedad son:');
+            for i:=1 to max_sint do
+            begin
+                if mi_enf.sintomas[i]<>null then writeln('-',nomb_sint(mi_enf.sintomas[i]));
+            end;
+        end;
+
+    until eof(Aenf)or (mi_enf.cod=cod);
+end;
+
+
+Function PromEdades:real; //calcula el promedio de edad de TODOS los pacientes;
+var suma:real;
+    pacAux:unpaciente;
+begin
+    reset(APac);
+    suma:=0;
+    while not eof(Apac) do
+    begin
+        read(Apac,pacAux);
+        suma:=suma+pacAux.edad;
+    end;
+    promEdades:=suma/filesize(APac);
+end;
+
+
+
+
+
+//Los is_in_array--#################################################################################################################################
+
+
+Function is_in_array(arr:array of string[3]; cod:string[3]):boolean;        //FUNCION PARA SABER SI UN CODIGO YA ESTA EN UN ARRAY de string de 3
+var i:integer;                                                   //Tomamos el parametro 'arr' como un array of string[3] para poder usar la misma funcion con las enfermedades y los sintomas(teneindo en cuanta que altera los indices del arreglo)
+begin
+    is_in_array:=False;
+    for i:= low(arr) to high(arr) do
+        begin
+            if (arr[i]=cod) then
+            begin
+                is_in_array:=True;
+                i:=high(arr);//Sale del for
+            end;
+        end;
+end;
+
+Function is_in_array(arr:array of char; cod:char):boolean;        //FUNCION PARA SABER SI UN CODIGO YA ESTA EN UN ARRAY de char
+var i:integer;
+begin
+    is_in_array:=False;
+    for i:= low(arr) to high(arr) do
+        begin
+            if (arr[i]=cod) then
+            begin
+                is_in_array:=True;
+                i:=high(arr);//Sale del for
+            end;
+        end;
+end;
+
+
+
+
+
+
+//Funciones de validoacion-###################################################################################################################################
 
 Function string_valido(msn:string; min,max:integer):string;  //FUNCION PARA VALIDAR LOS STRINGS
 begin
@@ -294,34 +397,6 @@ begin
 end;
 
 
-Function is_in_array(arr:array of string[3]; cod:string[3]):boolean;        //FUNCION PARA SABER SI UN CODIGO YA ESTA EN UN ARRAY de string de 3
-var i:integer;                                                   //Tomamos el parametro 'arr' como un array of string[3] para poder usar la misma funcion con las enfermedades y los sintomas(teneindo en cuanta que altera los indices del arreglo)
-begin
-    is_in_array:=False;
-    for i:= low(arr) to high(arr) do
-        begin
-            if (arr[i]=cod) then
-            begin
-                is_in_array:=True;
-                i:=high(arr);//Sale del for
-            end;
-        end;
-end;
-
-Function is_in_array(arr:array of char; cod:char):boolean;        //FUNCION PARA SABER SI UN CODIGO YA ESTA EN UN ARRAY de char
-var i:integer;
-begin
-    is_in_array:=False;
-    for i:= low(arr) to high(arr) do
-        begin
-            if (arr[i]=cod) then
-            begin
-                is_in_array:=True;
-                i:=high(arr);//Sale del for
-            end;
-        end;
-end;
-
 
 
 Function cod_str_no_repetido(msn:string; arr:array of string[3]):string[3];     //FUNCION PARA VERIFICAR QUE NO SE REPITE UN CODIGO
@@ -352,7 +427,9 @@ end;
 
 
 
-//Procedures------------------------------------------------------------------------------
+
+
+//Procedures--###########################################################################################################################################################
 
 Procedure boot;
 begin
@@ -534,47 +611,24 @@ if filesize(AEnf)<>0 then
    end;
 end;
 
+
+
+
+
+
+
+
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//################################################################################################################################################
 //MODULOS----------------------------------------------------------------------
-
-
-{
-Function ExisteDNI(mi_dni:string[8]):boolean;
-var fiambre:unpaciente;
-begin
-    ExisteDNI:=False;
-    reset(APac);
-    while not eof(APac) do
-    begin
-        read(APac,fiambre);
-        if fiambre.dni=mi_dni then ExisteDNI:=True;
-    end;
-
-end;}
-
-Function PromEdades:real; //calcula el promedio de edad de TODOS los pacientes;
-var suma:real;
-    pacAux:unpaciente;
-begin
-    reset(APac);
-    suma:=0;
-    while not eof(Apac) do
-    begin
-        read(Apac,pacAux);
-        suma:=suma+pacAux.edad;
-    end;
-    promEdades:=suma/filesize(APac);
-end;
-
-
-
+//################################################################################################################################################
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 Procedure Pacientes;        //INGRESO DE PACIENTES
-
 var
 fiambre,mirta:unpaciente;
 auxprov:unaprovincia;
-
 
 {sanos:integer;}
 {curado:char;}
@@ -609,9 +663,6 @@ clrscr;
         fiambre.dead:=opcion_binaria('Esta vivo o Muerto? (M/V) ','M','V','MAY');//hay que preguntar esto o va vivo por defecto????
 
 
-        {fiambre.curado:=opcion_binaria('Se ha curado? (S/N) ','S','N','MAY');  //Esto todavia hay qeu mostrarlo????
-        if curado='S' then
-            sanos:=sanos+1;}
         if (filesize(APac)=0) then
         begin
             //Es el mas viejo porqeu llego primero
@@ -658,7 +709,9 @@ clrscr;
 end;
 
 
-
+//                                                                                          #######################################################################
+//##################################################################################################################//////////////////////////////////////////////////
+//                                                                                          #######################################################################
 
 Procedure Enfermedades;         //BUSQUEDA DE ENFERMEDADES    //falta validar codigos y nombres
 var
@@ -704,7 +757,9 @@ end;
 
 
 
-
+//                                                                                          #######################################################################
+//##################################################################################################################//////////////////////////////////////////////////
+//                                                                                          #######################################################################
 
 
 
@@ -758,7 +813,16 @@ if (filesize(ASint)=cant_sint) then writeln('La base de datos esta llena');
         end;
 
 end;
-//-----------------------------------------------------------------------------------
+
+
+
+
+//                                                                                          #######################################################################
+//##################################################################################################################//////////////////////////////////////////////////
+//                                                                                          #######################################################################
+
+
+
 Procedure Ordenar1;
 var i,j:integer;
 PI,PJ:unaProvincia;
@@ -891,37 +955,10 @@ end;
 
 }
 
-function nomb_sint(cod:string[3]):string;  //le das un codigo y devuelve el nombre del sintoma en cuestion
-var mi_sint:unSintoma;
-begin
-    reset(Asint);
-    nomb_sint:='/nombre_no_encontrado/';
-    repeat
-        read(Asint,mi_sint);
-        if mi_sint.cod=cod then nomb_sint:=mi_sint.desc;
-    until eof(Asint) or (mi_sint.cod=cod);
-end;
 
-Procedure Mostrar_sint(cod:string[3]);
-var mi_enf:unaEnfermedad;
-    i:integer;
-begin
-    reset(Aenf);
-
-    repeat
-        read(Aenf,mi_enf);
-        if mi_enf.cod=cod then
-        begin
-            writeln('Los sintomas de la enfermedad son:');
-            for i:=1 to max_sint do
-            begin
-                if mi_enf.sintomas[i]<>null then writeln('-',nomb_sint(mi_enf.sintomas[i]));
-            end;
-        end;
-
-    until eof(Aenf)or (mi_enf.cod=cod);
-end;
-
+//                                                                                          #######################################################################
+//##################################################################################################################//////////////////////////////////////////////////
+//                                                                                          #######################################################################
 
 
 Procedure historias;
@@ -969,10 +1006,12 @@ begin
 end;
 
 
-
-//--------------------------------------------------
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 //PROGRAMA PRINCIPAL---------------------------------------------------------------------------------------------------------------------------------------------
-//--------------------------------------------------
+//&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 BEGIN
 boot;
     //Inicializacion de vairaibles
@@ -1020,7 +1059,6 @@ boot;
                 end;
         end;
 
-//Saludos
 for h:= 1 to 5 do
 begin
 textcolor(h);writeln('Gracias por utilizar nuestro software :)');
