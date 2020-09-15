@@ -14,7 +14,7 @@ Uses CRT,sysutils;
 //Constantes------------------------------------------------------------------------------
 
 Const
-cant_provincias=24;
+cant_provincias=2;
 cant_sint=20;
 cant_enf=10;
 max_sint=6;
@@ -121,6 +121,32 @@ begin
        end;
     end;
 end;
+
+
+Function rep_prov(reg:unaprovincia;campo:integer):boolean; //ingresa un registro de provincia y el numeor del campo que qeures chequar (1:cod, 2:desc)
+var aux:unaprovincia;                                      //Te va a tirar un true si esta repetido el campo, si nada se repita va un false
+begin
+    rep_prov:=False;
+    reset(AProv);
+
+    while not eof(AProv) and not(rep_prov) do
+    begin
+    read(AProv,aux);
+       case campo of
+            1:if reg.cod=aux.cod then
+                                 begin
+                                 writeln('Codigo ya ingresado');
+                                 rep_prov:=True;
+                                 end;
+            2:if reg.desc=aux.desc then
+                                   begin
+                                   writeln('Nombre ya ingresado');
+                                   rep_prov:=True;
+                                   end;
+       end;
+    end;
+end;
+
 
 
 Function rep_enf(reg:unaEnfermedad;campo:integer):boolean; //ingresa un registro de enfermedad y el numeor del campo que qeures chequar (1:cod, 2:desc)
