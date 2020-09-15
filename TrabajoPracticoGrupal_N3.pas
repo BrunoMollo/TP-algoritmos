@@ -129,14 +129,12 @@ begin
        case campo of
             1:if reg.cod=aux.cod then
                                  begin
-                                 //writeln('Codigo ya ingresado');
-                                 rep_prov:=True;
+                                    rep_prov:=True;
                                  end;
             2:if reg.desc=aux.desc then
-                                   begin
-                                   //writeln('Nombre ya ingresado');
-                                   rep_prov:=True;
-                                   end;
+                                begin
+                                    rep_prov:=True;
+                                end;
        end;
     end;
 end;
@@ -185,7 +183,7 @@ begin
                 writeln(' carcteres');
         end;
     until (length(string_valido)>=min) and (length(string_valido)<=max);
-
+    string_valido:=Uppercase(string_valido);
 end;
 
 
@@ -454,15 +452,18 @@ begin
         for i:= 1 to max_sint do
         begin
              repeat
-             dea.cod:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',reg.sintomas);
+                dea.cod:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',reg.sintomas);
 
-
-             if not rep_sint(dea,1) then writeln('Codigo no existente');
+                if not rep_sint(dea,1) then writeln('Codigo no existente');
              until rep_sint(dea,1);
              reg.sintomas[i]:=dea.cod;
 
-             if i=filesize(ASint) then i:=max_sint;
-             if (i<max_sint) then
+             if i=filesize(ASint) then
+             begin
+                i:=max_sint;
+                writeln('NO hay mas sintomas para cargar');
+             end
+             else if (i<max_sint) then
                 begin
                 if opcion_binaria('Desea ingresar otro sintoma? (S/N) ','S','N','MAY')= 'N'then
                 i:=max_sint;//sale del repeat
