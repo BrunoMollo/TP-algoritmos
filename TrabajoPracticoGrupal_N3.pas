@@ -51,8 +51,8 @@ unaEnfermedad = record
 unPaciente = record
            DNI:string[8];
            edad:integer;
-           cod:char;
-           cant:integer;
+           cod_prov:char;
+           cant_enf:integer;
            dead:char;
            end;
 unaHistoria = record
@@ -83,6 +83,7 @@ matriz_sintomas:matriz;
 P:unaProvincia;
 S:unSintoma;
 E:unaEnfermedad;
+
 AProv:file of unaProvincia;
 ASint:file of unSintoma;
 AEnf:file of unaEnfermedad;
@@ -97,7 +98,7 @@ acum_enf:integer;
 
 //Funciones------------------------------------------------------------------------------
 
-Function rep_sint(reg:unsintoma;campo:integer):boolean; //ingresa un registro de provincia y el numeor del campo que qeures chequar (1:cod, 2:desc)
+Function rep_sint(reg:unsintoma;campo:integer):boolean; //ingresa un registro de sintoma y el numeor del campo que qeures chequar (1:cod, 2:desc)
 var aux:unsintoma;                                      //Te va a tirar un true si esta repetido el campo, si nada se repita va un false
 begin
     rep_sint:=False;
@@ -121,6 +122,30 @@ begin
     end;
 end;
 
+
+Function rep_enf(reg:unaEnfermedad;campo:integer):boolean; //ingresa un registro de enfermedad y el numeor del campo que qeures chequar (1:cod, 2:desc)
+var aux:unaEnfermedad;                                      //Te va a tirar un true si esta repetido el campo, si nada se repita va un false
+begin
+    rep_enf:=False;
+    reset(Aenf);
+
+    while not eof(Aenf) and not(rep_enf) do
+    begin
+    read(Aenf,aux);
+       case campo of
+            1:if reg.cod=aux.cod then
+                                 begin
+                                 writeln('Codigo ya ingresado');
+                                 rep_enf:=True;
+                                 end;
+            2:if reg.desc=aux.desc then
+                                   begin
+                                   writeln('Nombre ya ingresado');
+                                   rep_enf:=True;
+                                   end;
+       end;
+    end;
+end;
 
 Function string_valido(msn:string; min,max:integer):string;  //FUNCION PARA VALIDAR LOS STRINGS
 begin
@@ -342,8 +367,9 @@ close(APac);
 close(AHist);
 end;
 
-Procedure borramela;
+Procedure borramela; //esto esta para debugear, la idea es que no este en le programa final
 begin
+writeln('La base de datos ha fallecido');
 Rewrite(AProv);
 Rewrite(ASint);
 Rewrite(AEnf);
@@ -466,39 +492,112 @@ end;
 //MODULOS----------------------------------------------------------------------
 
 
+<<<<<<< HEAD
 Procedure Pacient;        //INGRESO DE PACIENTES
+=======
+Function ExisteDNI(mi_dni:string[8]):boolean;
+var fiambre:unpaciente;
+begin
+    ExisteDNI:=False;
+    reset(APac);
+    while not eof(APac) do
+    begin
+        read(APac,fiambre);
+        if fiambre.dni=mi_dni then ExisteDNI:=True;
+    end;
+
+end;
+
+
+
+
+Procedure Pacientes;        //INGRESO DE PACIENTES {Bocha de cosas hay qeu borrar aca}
+>>>>>>> master
 var
-DNI,DNImirta:string[8];
-edad,sanos,edadrecord:integer;
-sumaedades,cantpacientes:real;
-curado,reset:char;
+fiambre,mirta:unpaciente;
+
+{DNI,DNImirta:string[8];}
+{edad,sanos,edadrecord:integer;}
+{sumaedades,cantpacientes:real;}
+{curado,reset:char;}
 begin
 clrscr;
-    edadrecord:=0;
+    //El mas viejo va a estar primero, entonces lo bajo
+    seek(APac,0);
+    if(filesize(APac)<>0) then read(APac,mirta)
+    else mirta.edad:=0;
+
+
+
+    {edadrecord:=0;
     cantpacientes:=0;
     sumaedades:=0;
-    sanos:=0;
+    sanos:=0; }
+
     repeat
-        DNI:=string_num_valido('Ingrese el numero del DNI: ',1,8);
-        edad:=int_valido('Ingrese la edad del paciente: ',0,125);
-        curado:=opcion_binaria('Se ha curado? (S/N) ','S','N','MAY');
-        if curado='S' then
-            sanos:=sanos+1;
-        if edad>edadrecord then
-            begin
-            edadrecord:=edad;
-            DNImirta:=DNI;
-            end;
-        sumaedades:=sumaedades+edad;
-        cantpacientes:=cantpacientes+1;
-        reset:=opcion_binaria('Desea ingresar otro paciente? (S/N) ','S','N','MAY');
         writeln;
-    until reset='N';
+        //Chequeo que no haya dni repetido
+        repeat
+            fiambre.dni:=string_num_valido('Ingrese el numero del DNI: ',1,8);
+            if ExisteDNI(fiambre.dni) then writeln('Ya ingresaron ese DNI');
+        until not ExisteDNI(fiambre.dni);
+
+        fiambre.edad:=int_valido('Ingrese la edad del paciente: ',0,125);
+
+        fiambre.cod_prov:=char_valido('Ingrese codigo de provincia: ','A','Z','MAY');//Hay que validar esta cosa?????
+        fiambre.cant_enf:=0;//Empieza en cero, no???
+        fiambre.dead:=opcion_binaria('Esta vivo o Muerto? (M/V) ','M','V','MAY');//hay que preguntar esto o va vivo por defecto????
 
 
-    writeln('El promedio de edades de todos los pacientes atendidos es de: ',sumaedades/cantpacientes:6:2);
-    writeln('La cantidad de pacientes curados es de: ',sanos);
-    writeln('El paciente de mayor edad afectado tiene ',edadrecord,' y su DNI es ',DNImirta);
+        {fiambre.curado:=opcion_binaria('Se ha curado? (S/N) ','S','N','MAY');  //Esto todavia hay qeu mostrarlo????
+        if curado='S' then
+            sanos:=sanos+1;}
+        if (filesize(APac)=0) then
+        begin
+            //Es el mas viejo porqeu llego primero
+            mirta.dni:=fiambre.dni;
+            mirta.edad:=fiambre.edad;
+            mirta.cod_prov:=fiambre.cod_prov;
+            mirta.cant_enf:=fiambre.cant_enf;
+            mirta.dead:=fiambre.dead;
+
+            write(APac,fiambre);
+        end
+        else
+        begin
+            if (fiambre.edad>mirta.edad) then
+                begin
+                    seek(APac,filesize(APac));
+                    write(Apac,mirta);//escribo al destronado al final
+
+                    //Efiambre se confierte en la nueva mirta
+                    mirta.dni:=fiambre.dni;
+                    mirta.edad:=fiambre.edad;
+                    mirta.cod_prov:=fiambre.cod_prov;
+                    mirta.cant_enf:=fiambre.cant_enf;
+                    mirta.dead:=fiambre.dead;
+
+                    seek(APac,0);
+                    write(APac,mirta);//Escribo el nuvo record al principio
+
+                end
+            else
+                begin
+                    seek(APac,filesize(APac));
+                    write(Apac,fiambre);
+                end;
+        end;
+
+
+        {sumaedades:=sumaedades+edad;     //Si vamos a calclar el promedio supongo que va a ser de una manera menos rudimentaria
+        cantpacientes:=cantpacientes+1;}
+
+    until opcion_binaria('Desea ingresar otro paciente? (S/N) ','S','N','MAY')='N';
+
+
+    //writeln('El promedio de edades de todos los pacientes atendidos es de: ',sumaedades/cantpacientes:6:2);
+    //writeln('La cantidad de pacientes curados es de: ',sanos);
+    writeln('El paciente de mayor edad afectado tiene ',mirta.edad,' y su DNI es ',mirta.dni);
 end;
 
 
