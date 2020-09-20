@@ -246,6 +246,19 @@ begin
 end;
 
 
+Function TotalCurados:integer;  //Muestra el total de historias clinicas cuyo paciente sa ha curado
+var h:unahistoria;
+begin
+    TotalCurados:=0;
+    reset(Ahist);
+    while not eof(Ahist) do
+    begin
+        read(Ahist,h);
+        if h.curado='S' then TotalCurados:=TotalCurados+1;
+    end;
+end;
+
+
 
 
 
@@ -704,7 +717,7 @@ clrscr;
 
     Writeln;Writeln;
     writeln('El promedio de edades de todos los pacientes atendidos es de: ',PromEdades:6:2);
-    //writeln('La cantidad de pacientes curados es de: ',sanos);
+    writeln('Ya se han curado ',TotalCurados,' pacientes');
     writeln('El paciente de mayor edad afectado tiene ',mirta.edad,' y su DNI es ',mirta.dni);
 end;
 
@@ -961,25 +974,53 @@ end;
 //                                                                                          #######################################################################
 
 
+
+
 Procedure historias;
 var auxPac:unpaciente;
     auxEnf:unaEnfermedad;
     auxSint:unSintoma;
     auxHist:unahistoria;
     csint,i:integer;
+    seguir:char;
 begin
     clrscr;
+    seguir:='S';
 
+
+    //Pido el DNI
+    repeat
     auxPac.dni:=string_num_valido('Ingrese el numero del DNI: ',1,8);
-    if not rep_pac(auxPac,1) then writeln('Ese dni no esta en la base de datos')
-    else
+    if not rep_pac(auxPac,1) then
     begin
-        auxEnf.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
-        if not rep_enf(auxEnf,1) then writeln('Esa enfermedad no existe') else
+        writeln('NO tenemos registrado ese dni');
+        seguir:=opcion_binaria('Quiere volvear a intentar?(S/N): ','S','N','MAY');
+    end;
+    until (rep_pac(auxPac,1)) or (seguir='N');
+
+
+
+
+    //Pido el codigo de la enfermedad
+    if rep_pac(auxPac,1) and (seguir='S') then
+    begin
+        repeat
+            auxEnf.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
+            if not rep_enf(auxEnf,1) then
+            begin
+                writeln('NO tenemos registrado esa enfermedad');
+                seguir:=opcion_binaria('Quiere volvear a intentar?(S/N): ','S','N','MAY');
+            end;
+        until (rep_enf(auxEnf,1)) or (seguir='N');
+
+
+        //pido resto de los datos
+        if rep_enf(auxEnf,1) and (seguir='S') then
             begin
                 auxHist.dni:=auxPac.dni;
                 auxHist.cod_enf:=auxEnf.cod;
 
+                writeln;
                 Mostrar_sint(auxHist.cod_enf);
 
                 auxHist.curado:=opcion_binaria('Se ha curado?(S/N): ','S','N','MAY');
@@ -997,10 +1038,12 @@ begin
 
                 seek(Ahist,filesize(Ahist));
                 write(Ahist,auxHist);
+
+                writeln;
+                if opcion_binaria('Desea ingresar otro historia clinica?(S/N)','S','N','MAY')='S' then historias;
             end;
     end;
-    writeln;
-    if opcion_binaria('Desea ingresar otro historia clinica?(S/N)','S','N','MAY')='S' then historias;
+
 
 
 end;
