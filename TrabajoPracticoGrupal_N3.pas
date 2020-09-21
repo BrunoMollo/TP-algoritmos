@@ -314,7 +314,7 @@ end;
 
 
 
-//Funciones de validoacion-###################################################################################################################################
+//Funciones de validacion-###################################################################################################################################
 
 Function string_valido(msn:string; min,max:integer):string;  //FUNCION PARA VALIDAR LOS STRINGS
 begin
@@ -651,9 +651,57 @@ if filesize(AEnf)<>0 then
 end;
 
 
+Procedure Resumen_sint;
+var i,acum:integer;
+X:unSintoma;
+Y:unaEnfermedad;
+begin
+reset(ASint);
+     while not eof(ASint) do
+           begin
+           acum:=0;
+           read(ASint,X);
+           reset(AEnf);
+           while not eof(AEnf) do
+                 begin
+                 read(AEnf,Y);
+                 for i:=1 to max_sint do
+                     if X.cod = Y.sintomas[i] then
+                     acum:=acum+1;
+                 end;
+           writeln('El sintoma ',x.desc,', codigo ',x.cod,' es presentado por ',acum,' enfermedades');
+           end;
+end;
 
-
-
+Procedure Enf_prom;
+var edades,cont:integer;
+X:unPaciente;
+Y:unaEnfermedad;
+Z:unaHistoria;
+begin
+reset(AEnf);
+while not eof(AEnf) do
+      begin
+      edades:=0;
+      cont:=0;
+      read(AEnf,Y);
+      reset(AHist);           //ok
+      while not eof (AHist) do
+            begin
+                 read(AHist,Z);
+                      if Z.cod_enf = Y.cod then
+                      begin
+                           reset(APac);
+                           repeat
+                           read(APac,X);
+                           until Z.dni = X.dni;
+                           edades:=edades+X.edad;
+                           cont:=cont+1;
+                      end;
+            end;
+      writeln('El promedio de pacientes con la enfermedad: ',Y.desc,' fue de ',edades/cont:6:1);
+      end;
+end;
 
 
 
@@ -1149,7 +1197,7 @@ IngresadosFecha;
             3: if (filesize(ASint)<>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
             4: if (filesize(AProv)>0)then Pacientes else writeln('Primero vas a tener que  cargar las provincias');
             5: if (filesize(Apac)>0)and(filesize(Aenf)>0)then historias else writeln('Tiene que haber datos cargados en Pacientes y en Enfermedades');
-            6: writeln('En construccion');
+            6: enf_prom;//writeln('En construccion');
             7: Borramela;
             0: begin
                Andando:=False;
