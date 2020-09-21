@@ -673,6 +673,7 @@ while not eof(AEnf) do
                            cont:=cont+1;
                       end;
             end;
+      if cont<>0 then
       writeln('El promedio de pacientes con la enfermedad: ',Y.desc,' fue de ',edades/cont:6:1);
       end;
 end;
