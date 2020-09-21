@@ -298,7 +298,7 @@ end;
 
 
 
-//Funciones de validoacion-###################################################################################################################################
+//Funciones de validacion-###################################################################################################################################
 
 Function string_valido(msn:string; min,max:integer):string;  //FUNCION PARA VALIDAR LOS STRINGS
 begin
@@ -625,7 +625,27 @@ if filesize(AEnf)<>0 then
 end;
 
 
-
+Procedure Resumen_sint;
+var i,acum:integer;
+X:unSintoma;
+Y:unaEnfermedad;
+begin
+reset(ASint);
+     while not eof(ASint) do
+           begin
+           acum:=0;
+           read(ASint,X);
+           reset(AEnf);
+           while not eof(AEnf) do
+                 begin
+                 read(AEnf,Y);
+                 for i:=1 to max_sint do
+                     if X.cod = Y.sintomas[i] then
+                     acum:=acum+1;
+                 end;
+           writeln('El sintoma ',x.desc,', codigo ',x.cod,' es presentado por ',acum,' enfermedades');
+           end;
+end;
 
 
 
