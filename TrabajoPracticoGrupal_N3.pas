@@ -14,7 +14,7 @@ Uses CRT,sysutils;
 //Constantes------------------------------------------------------------------------------
 
 Const
-cant_provincias=2;
+cant_provincias=24;
 cant_sint=20;
 cant_enf=10;
 max_sint=6;
@@ -72,7 +72,7 @@ unaHistoria = record
 
 VAR
 //Para el menu principal
-Opcion,h:integer;
+Opcion,q:integer;
 Andando:boolean;
 
 
@@ -87,6 +87,7 @@ matriz_sintomas:matriz;
 P:unaProvincia;
 S:unSintoma;
 E:unaEnfermedad;
+H:unaHistoria;
 
 AProv:file of unaProvincia;
 ASint:file of unSintoma;
@@ -191,9 +192,6 @@ begin
             end;
     end;
 end;
-
-
-
 
 
 
@@ -834,6 +832,23 @@ end;
 //##################################################################################################################//////////////////////////////////////////////////
 //                                                                                          #######################################################################
 
+//PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL
+//PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL
+//PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL
+
+Procedure Busqueda_Letra;
+var acum:integer;
+begin
+    reset(AProv);
+    acum:=0;
+    while not EOF(AProv) do
+        begin
+            read(AProv,P);
+            if P.desc[1] = 'S' then
+                acum:=acum+1;
+        end;
+writeln('La cantidad de provincias que empiezan con la letra S es de: ',acum);
+end;
 
 
 Procedure Ordenar1;
@@ -893,7 +908,7 @@ begin
 end;
 
 
-//PROVINCIAS FINAL?
+//PROVINCIAS FINAL      ----MODULO----
 Procedure Provincias;
 var i:integer;
 begin                           //CARGA DE PROVINCIAS
@@ -916,12 +931,13 @@ begin                           //CARGA DE PROVINCIAS
                 write(AProv,P);
             end;
     end
-    else write('Las provincias ya fueron cargadas...');
+    else write('Las provincias ya fueron cargadas...'); writeln();
 
 
 reset(AProv);
     writeln();
-//    write('La cantidad de provincias que empiezan con la letra S es de: ',);   //ACA VA LA FUNCION QUE BUSCA LA LETRA
+    Busqueda_Letra;
+    //write('La cantidad de provincias que empiezan con la letra S es de: ',);
     writeln();writeln();
     writeln('Codigo de provincias ordenado alfabeticamente');
     Ordenar1;
@@ -929,8 +945,68 @@ reset(AProv);
     writeln('Provincias ordenadas alfabeticamente');
     Ordenar2;
 
+end;
+
+//-----------------------------------------------------------------------------------------------------
+
+Procedure Provincia_con_mas_enfermos();
+begin
+    reset(AHist);
+    while not EOF(AHist) do
+        begin
+            read(AHist,H);
+            //writeln('HOLA MA ESTOY EN LA TELE');
+        end;
+end;
+
+
+//--------------------------------------------------
+Procedure Estadisticas();
+var
+working:boolean;
+choice:integer;
+begin
+    working:=True;
+    writeln();
+    while working= True do
+        begin
+            writeln('ESTADISTICAS');
+            writeln('-------------');
+            writeln();
+            writeln('1) Estadisticas de Sintomas');
+            writeln('2) Estadisticas de Enfermedades (Promedio de edad)');
+            writeln('3) Estadisticas de Enfermedades (Pacientes atendidos y curados');
+            writeln('4) Quien fue el mayor atendido y cual es su edad?');
+            writeln('5) Cual fue la provincia que mas enfermos atendio?');
+            writeln('6) Estadisticas de Fecha de ingreso al sistema y motivo');
+            writeln('7) Estadisticas de Personas fallecidas');
+            writeln('8) Estadisticas de Pacientes atendidos');
+            writeln('0) Salir');
+            writeln();
+            choice:=int_valido('Ingrese la opcion: ',0,8);
+            Case choice of
+            1: writeln('MOSTRAME');
+            2: writeln('MOSTRAME');
+            3: writeln('MOSTRAME');
+            4: writeln('MOSTRAME');
+            5: writeln('MOSTRAME');
+            6: writeln('MOSTRAME');
+            7: writeln('MOSTRAME');
+            8: writeln('MOSTRAME');
+            0: working:=False;
+            end;
+            writeln;
+            if(opcion<>0) then
+                begin
+                    writeln('Press any key to continue...');readkey;
+                    clrscr;
+                end;
+
+        end;
 
 end;
+
+
 //-----------------------------------------------------------------------------------
 {Procedure Provincias;       //CARGA DE PROVINCIAS
 var
@@ -975,6 +1051,15 @@ end;
 
 
 
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------------------
 
 Procedure historias;
 var auxPac:unpaciente;
@@ -1085,7 +1170,7 @@ boot;
             3: if (filesize(ASint)<>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
             4: if (filesize(AProv)>0)then Pacientes else writeln('Primero vas a tener que  cargar las provincias');
             5: if (filesize(Apac)>0)and(filesize(Aenf)>0)then historias else writeln('Tiene que haber datos cargados en Pacientes y en Enfermedades');
-            6: writeln('En construccion');
+            6: Estadisticas;
             7: Borramela;
             0: begin
                Andando:=False;
@@ -1102,9 +1187,9 @@ boot;
                 end;
         end;
 
-for h:= 1 to 5 do
+for q:= 1 to 5 do
 begin
-textcolor(h);writeln('Gracias por utilizar nuestro software :)');
+textcolor(q);writeln('Gracias por utilizar nuestro software :)');
 end;
 readkey;
 END.
