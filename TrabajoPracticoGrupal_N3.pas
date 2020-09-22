@@ -18,7 +18,7 @@ cant_provincias=2;
 cant_sint=20;
 cant_enf=10;
 max_sint=6;
-sint_por_historia=2;
+sint_por_historia=6;
 null=char(0)+char(0)+char(0);
 
 
@@ -115,6 +115,8 @@ begin
 end;
 
 
+
+
 Function rep_sint(reg:unsintoma;campo:integer):boolean; //ingresa un registro de sintoma y el numeor del campo que qeures chequar (1:cod, 2:desc)
 var aux:unsintoma;                                      //Te va a tirar un true si esta repetido el campo, si nada se repita va un false
 begin
@@ -208,6 +210,20 @@ begin
         if mi_sint.cod=cod then nomb_sint:=mi_sint.desc;
     until eof(Asint) or (mi_sint.cod=cod);
 end;
+
+function nomb_enf(cod:string[3]):string;  //le das un codigo y devuelve el nombre de la enfermedad en cuestion
+var mi_enf:unaEnfermedad;
+begin
+    reset(Aenf);
+    nomb_enf:='/nombre_no_encontrado/';
+    repeat
+        read(Aenf,mi_enf);
+        if mi_enf.cod=cod then nomb_enf:=mi_enf.desc;
+    until (eof(Aenf)) or (mi_enf.cod=cod);
+end;
+
+
+
 
 
 Procedure Mostrar_sint(cod:string[3]);
@@ -312,7 +328,7 @@ begin
             if min=1 then
                 writeln(' caracter')
             else
-                writeln(' carcteres');
+                writeln(' caracteres');
         end;
 
         if length(string_valido)>max then
@@ -321,7 +337,7 @@ begin
             if max=1 then
                 writeln(' caracter')
             else
-                writeln(' carcteres');
+                writeln(' caracteres');
         end;
     until (length(string_valido)>=min) and (length(string_valido)<=max);
     string_valido:=Uppercase(string_valido);
@@ -439,7 +455,17 @@ begin
 end;
 
 
-
+function pedirFecha:TdateTime;
+var d,m,a:integer;
+begin
+    repeat
+        d:=int_valido('Ingresar dia: ',1,31);
+        m:=int_valido('Ingresar mes: ',1,12);
+        a:=int_valido('Ingresar a'+char(164)+'os: ',0,3000);
+        pedirFecha:=encodeDate(a,m,d);
+        if date_to_str(pedirFecha)<>format ('%d/%d/%d ',[d,m,a]) then writeln(format ('%d/%d/%d ',[d,m,a]),' no existe');
+    until date_to_str(pedirFecha)=format ('%d/%d/%d ',[d,m,a]);
+end;
 
 
 //Procedures--###########################################################################################################################################################
@@ -557,7 +583,7 @@ var                                     //ver si hay alguna funcion que me sirva
                                         //cod_str_no_repetido?
 i,cont:integer;
 auxiliar:string[3];
-dea:unSintoma;
+SintAux:unSintoma;
 
 begin
 //                  E.sintomas = array [1..max_sint=6]  of string[3]
@@ -567,10 +593,10 @@ begin
         for i:= low(arr) to high(arr) do
         begin
              repeat
-                dea.cod:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',arr);
-                if not rep_sint(dea,1) then writeln('Codigo no existente');
-             until rep_sint(dea,1);
-             arr[i]:=dea.cod;
+                SintAux.cod:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',arr);
+                if not rep_sint(SintAux,1) then writeln('Codigo no existente');
+             until rep_sint(SintAux,1);
+             arr[i]:=SintAux.cod;
 
              if i=high(arr) then writeln('NO se pueden registrar mas de ',i+1,' sintomas');
              if i=filesize(ASint)-1  then
@@ -1080,10 +1106,11 @@ begin
 
                 auxHist.efector:=string_valido('Nombre del efector: ',1,30);
 
-                auxHist.fecha_ingreso:=date();
 
+                auxHist.fecha_ingreso:=pedirFecha;
+                {auxHist.fecha_ingreso:=date();
                 writeln;
-                writeln('Se ha registrado esta histoira clinica con la fecha ',date_to_str(auxHist.fecha_ingreso));
+                writeln('Se ha registrado esta histoira clinica con la fecha ',date_to_str(auxHist.fecha_ingreso));}
 
                 seek(Ahist,filesize(Ahist));
                 write(Ahist,auxHist);
@@ -1098,14 +1125,51 @@ begin
 end;
 
 
+
+//                                                                                          #######################################################################
+//##################################################################################################################//////////////////////////////////////////////////
+//                                                                                          #######################################################################
+
+
+
+
+Procedure IngresadosFecha;
+var Auxhist:unaHistoria;
+    hay_algo:boolean;
+    pedida:TdateTime;
+begin
+    pedida:=pedirFecha;
+
+    writeln('---------------------------');
+
+    reset(Ahist);
+    hay_algo:=False;
+    while not eof(Ahist) do
+    begin
+        read(Ahist,Auxhist);
+        if auxhist.fecha_ingreso=pedida then
+        begin
+            hay_algo:=True;
+            writeln(Auxhist.dni,' - ',nomb_enf(Auxhist.cod_enf));
+        end;
+    end;
+    if not hay_algo then writeln('Parece que ningun paciente fue ingresado en esta fecha...');
+
+
+
+end;
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-//PROGRAMA PRINCIPAL---------------------------------------------------------------------------------------------------------------------------------------------
+//PROGRAMA PRINCIPAL-------------------------------------------------hist--------------------------------------------------------------------------------------------
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 BEGIN
 boot;
+IngresadosFecha;
+
     //Inicializacion de vairaibles
     acum_sint:=0;
     acum_enf:=0;
