@@ -14,7 +14,7 @@ Uses CRT,sysutils;
 //Constantes------------------------------------------------------------------------------
 
 Const
-cant_provincias=24;
+cant_provincias=5;
 cant_sint=20;
 cant_enf=10;
 max_sint=6;
@@ -850,8 +850,41 @@ begin
 writeln('La cantidad de provincias que empiezan con la letra S es de: ',acum);
 end;
 
+Procedure Ordenar(modo:integer);
+var i,j:integer;
+PI,PJ:unaProvincia;
+banana:boolean;
+begin
+    reset(AProv);
+    for i:= 0 to filesize(AProv)-2 do
+        for j:= i+1 to filesize(AProv)-1 do
+            begin
+                seek(AProv,i);
+                read(AProv,PI);
+                seek(AProv,j);
+                read(AProv,PJ);
+                banana:=False;
+                case modo of
+                1: if (PI.cod > PJ.cod) then banana:=True;
+                2: if (PI.desc > PJ.desc) then banana:=True;
+                end;
+                if (banana) then
+                    begin
+                        seek(AProv,i);
+                        write(AProv,PJ);
+                        seek(AProv,j);
+                        write(AProv,PI);
+                    end;
+            end;
+    reset(AProv);
+    for i:= 1 to filesize(AProv) do
+        begin
+            read(AProv,P);
+            writeln(P.cod,'  ','-','  ',P.desc);
+        end;
+end;
 
-Procedure Ordenar1;
+{Procedure Ordenar1;
 var i,j:integer;
 PI,PJ:unaProvincia;
 begin
@@ -906,7 +939,7 @@ begin
             writeln(P.cod,'  ','-','  ',P.desc);
         end;
 end;
-
+}
 
 //PROVINCIAS FINAL      ----MODULO----
 Procedure Provincias;
@@ -940,10 +973,10 @@ reset(AProv);
     //write('La cantidad de provincias que empiezan con la letra S es de: ',);
     writeln();writeln();
     writeln('Codigo de provincias ordenado alfabeticamente');
-    Ordenar1;
+    Ordenar(1);
     writeln();
     writeln('Provincias ordenadas alfabeticamente');
-    Ordenar2;
+    Ordenar(2);
 
 end;
 
