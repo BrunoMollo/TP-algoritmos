@@ -88,6 +88,7 @@ P:unaProvincia;
 S:unSintoma;
 E:unaEnfermedad;
 H:unaHistoria;
+C:unPaciente;
 
 AProv:file of unaProvincia;
 ASint:file of unSintoma;
@@ -983,13 +984,26 @@ end;
 //-----------------------------------------------------------------------------------------------------
 
 Procedure Provincia_con_mas_enfermos();
-begin
-    reset(AHist);
-    while not EOF(AHist) do
+var i,k:integer;                                       //HACER UNA MATRIZ CON LAS PROVINCIAS
+begin                                                  //BUSCAR EN LOS PACIENTES EL CODIGO DE LA PROVINCIA
+    reset(APac);                                       //E IR SUMANDO CON UN CONTADOR EN LA MATRIZ
+    reset(AProv);                                      //DESPUES RECORRER LA MATRIZ Y MOSTRAR CUAL FUE LA QUE MAS TIENE
+    for i:= 1 to filesize(AProv) do
+        begin                                          //for i:= 1 to cant_provincias do    codprov[i,j]:=P.cod     for k:= 1 to filesize(APac) do  read(APac,C)    aux:=C.cod_prov     //BUSCAR EN MATRIZ Y SUMAR CONTADOR
+        read(AProv,P);
+        codprov[i]:=P.cod;
+        end;
+    for k:= 1 to cant_provincias do
+        writeln(codprov[k]);
+
+
+{    while not EOF(APac) do
         begin
-            read(AHist,H);
+            read(APac,C);
             //writeln('HOLA MA ESTOY EN LA TELE');
         end;
+
+}
 end;
 
 
@@ -1018,7 +1032,7 @@ begin
             writeln();
             choice:=int_valido('Ingrese la opcion: ',0,8);
             Case choice of
-            1: writeln('MOSTRAME');
+            1: Provincia_con_mas_enfermos();//writeln('MOSTRAME');
             2: writeln('MOSTRAME');
             3: writeln('MOSTRAME');
             4: writeln('MOSTRAME');
