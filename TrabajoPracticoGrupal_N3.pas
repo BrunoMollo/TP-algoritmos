@@ -984,13 +984,15 @@ end;
 //-----------------------------------------------------------------------------------------------------
 
 Procedure Provincia_con_mas_enfermos();
-var i,j,k:integer;
+var i,j,k,l:integer;
+indice,acum:integer;
+codprov:array [1..cant_provincias] of char;
 cont_provincia:array[1..cant_provincias]of integer;
 begin
     reset(APac);
     reset(AProv);
     for k:= 1 to filesize(AProv) do
-        begin                                          //for i:= 1 to cant_provincias do    codprov[i,j]:=P.cod     for k:= 1 to filesize(APac) do  read(APac,C)    aux:=C.cod_prov     //BUSCAR EN MATRIZ Y SUMAR CONTADOR
+        begin
         read(AProv,P);
         codprov[k]:=P.cod;
         cont_provincia[k]:=0;
@@ -1001,7 +1003,7 @@ begin
             read(APac,C);
             for j:= 1 to cant_provincias do
                 begin
-                    if (C.cod_prov = cont_provincia[j]) then
+                    if (C.cod_prov = codprov[j]) then
                         cont_provincia[j]:=cont_provincia[j] + 1;
                 end;
         end;
@@ -1009,11 +1011,14 @@ begin
     acum:=0;
     for l:= 1 to cant_provincias do
         begin
-            if (cant_provincias[l]>acum) then
-                acum:=cant_provincias[l];
+            if (cont_provincia[l]>acum) then
+                begin
+                acum:=cont_provincia[l];
+                indice:=l;
+                end;
         end;
    writeln();
-   writeln('La provincia con mas enfermos es la provincia con codigo ',codprov[l]);
+   writeln('La provincia con mas enfermos es la provincia con codigo ',codprov[indice]);
 
 
 end;
