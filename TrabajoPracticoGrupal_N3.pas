@@ -1193,11 +1193,11 @@ begin
             writeln();
             choice:=int_valido('Ingrese la opcion: ',0,8);
             Case choice of
-            1: Provincia_con_mas_enfermos();//writeln('MOSTRAME');
+            1: writeln('MOSTRAME');
             2: writeln('MOSTRAME');
             3: writeln('MOSTRAME');
             4: writeln('MOSTRAME');
-            5: writeln('MOSTRAME');
+            5: Provincia_con_mas_enfermos();
             6: writeln('MOSTRAME');
             7: writeln('MOSTRAME');
             8: writeln('MOSTRAME');
