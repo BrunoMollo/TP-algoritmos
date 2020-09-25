@@ -984,26 +984,38 @@ end;
 //-----------------------------------------------------------------------------------------------------
 
 Procedure Provincia_con_mas_enfermos();
-var i,k:integer;                                       //HACER UNA MATRIZ CON LAS PROVINCIAS
-begin                                                  //BUSCAR EN LOS PACIENTES EL CODIGO DE LA PROVINCIA
-    reset(APac);                                       //E IR SUMANDO CON UN CONTADOR EN LA MATRIZ
-    reset(AProv);                                      //DESPUES RECORRER LA MATRIZ Y MOSTRAR CUAL FUE LA QUE MAS TIENE
-    for i:= 1 to filesize(AProv) do
+var i,j,k:integer;
+cont_provincia:array[1..cant_provincias]of integer;
+begin
+    reset(APac);
+    reset(AProv);
+    for k:= 1 to filesize(AProv) do
         begin                                          //for i:= 1 to cant_provincias do    codprov[i,j]:=P.cod     for k:= 1 to filesize(APac) do  read(APac,C)    aux:=C.cod_prov     //BUSCAR EN MATRIZ Y SUMAR CONTADOR
         read(AProv,P);
-        codprov[i]:=P.cod;
+        codprov[k]:=P.cod;
+        cont_provincia[k]:=0;
         end;
-    for k:= 1 to cant_provincias do
-        writeln(codprov[k]);
 
-
-{    while not EOF(APac) do
+    for i:= 1 to filesize(APac) do
         begin
             read(APac,C);
-            //writeln('HOLA MA ESTOY EN LA TELE');
+            for j:= 1 to cant_provincias do
+                begin
+                    if (C.cod_prov = cont_provincia[j]) then
+                        cont_provincia[j]:=cont_provincia[j] + 1;
+                end;
         end;
 
-}
+    acum:=0;
+    for l:= 1 to cant_provincias do
+        begin
+            if (cant_provincias[l]>acum) then
+                acum:=cant_provincias[l];
+        end;
+   writeln();
+   writeln('La provincia con mas enfermos es la provincia con codigo ',codprov[l]);
+
+
 end;
 
 
