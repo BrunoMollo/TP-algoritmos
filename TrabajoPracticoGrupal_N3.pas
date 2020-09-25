@@ -261,6 +261,15 @@ begin
 end;
 
 
+Procedure mostrar_Mayor_paciente;
+var veterano:unpaciente;
+begin
+    seek(Apac,0);
+    read(Apac,veterano);
+    writeln('El paciente con mayor edad tiene ',veterano.edad,' y su DNI es ',veterano.dni);
+end;
+
+
 Function TotalCurados:integer;  //Muestra el total de historias clinicas cuyo paciente sa ha curado
 var h:unahistoria;
 begin
@@ -470,31 +479,32 @@ end;
 //Procedures--###########################################################################################################################################################
 
 Procedure boot;
+const dir='C:/TP3';//Carpeta conde se va an a guardar los .dat
 begin
-    CreateDir('C:/TP3');
+    CreateDir(dir);
 
-    assign(AProv,'C:/TP3/Provincias.dat');
+    assign(AProv,dir+'/Provincias.dat');
     {$I-}
     reset(AProv);
     if ioresult=2 then
         rewrite(AProv);
     {$I+}
 
-    assign(AEnf,'C:/TP3/Enfermedades.dat');
+    assign(AEnf,dir+'/Enfermedades.dat');
     {$I-}
     reset(AEnf);
     if ioresult=2 then
         rewrite(AEnf);
     {$I+}
 
-    assign(ASint,'C:/TP3/Sintomas.dat');
+    assign(ASint,dir+'/Sintomas.dat');
     {$I-}
     reset(ASint);
     if ioresult=2 then
         rewrite(ASint);
     {$I+}
 
-    assign(APac,'C:/TP3/Pacientes.dat');
+    assign(APac,dir+'/Pacientes.dat');
     {$I-}
     reset(APac);
     if ioresult=2 then
@@ -502,7 +512,7 @@ begin
     {$I+}
 
 
-    assign(AHist,'C:/TP3/Historias.dat');
+    assign(AHist,dir+'/Historias.dat');
     {$I-}
     reset(AHist);
     if ioresult=2 then
@@ -861,7 +871,7 @@ clrscr;
     Writeln;Writeln;
     writeln('El promedio de edades de todos los pacientes atendidos es de: ',PromEdades:6:2);
     writeln('Ya se han curado ',TotalCurados,' pacientes');
-    writeln('El paciente de mayor edad afectado tiene ',mirta.edad,' y su DNI es ',mirta.dni);
+    mostrar_Mayor_paciente;
 end;
 
 
@@ -1090,6 +1100,7 @@ end;
 Procedure Provincias;
 var i:integer;
 begin                           //CARGA DE PROVINCIAS
+    clrscr;
     reset(AProv);
     If not (filesize(AProv) = cant_provincias) then
     begin
@@ -1168,6 +1179,32 @@ begin
 end;
 
 
+
+Procedure IngresadosFecha;
+var Auxhist:unaHistoria;
+    hay_algo:boolean;
+    pedida:TdateTime;
+begin
+    pedida:=pedirFecha;
+
+    writeln('---------------------------');
+
+    reset(Ahist);
+    hay_algo:=False;
+    while not eof(Ahist) do
+    begin
+        read(Ahist,Auxhist);
+        if auxhist.fecha_ingreso=pedida then
+        begin
+            hay_algo:=True;
+            writeln(Auxhist.dni,' - ',nomb_enf(Auxhist.cod_enf));
+        end;
+    end;
+    if not hay_algo then writeln('Parece que ningun paciente fue ingresado en esta fecha...');
+
+end;
+
+
 //--------------------------------------------------
 Procedure Estadisticas();
 var
@@ -1186,7 +1223,7 @@ begin
             writeln('3) Estadisticas de Enfermedades (Pacientes atendidos y curados');
             writeln('4) Quien fue el mayor atendido y cual es su edad?');
             writeln('5) Cual fue la provincia que mas enfermos atendio?');
-            writeln('6) Estadisticas de Fecha de ingreso al sistema y motivo');
+            writeln('6) Paceintes ingresados en una fecha');
             writeln('7) Estadisticas de Personas fallecidas');
             writeln('8) Estadisticas de Pacientes atendidos');
             writeln('0) Salir');
@@ -1196,9 +1233,9 @@ begin
             1: writeln('MOSTRAME');
             2: writeln('MOSTRAME');
             3: writeln('MOSTRAME');
-            4: writeln('MOSTRAME');
-            5: Provincia_con_mas_enfermos();
-            6: writeln('MOSTRAME');
+            4: if(filesize(Apac)>0)then mostrar_Mayor_paciente else writeln('No hay paceintes cargados');
+            5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
+            6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
             7: writeln('MOSTRAME');
             8: writeln('MOSTRAME');
             0: working:=False;
@@ -1372,31 +1409,30 @@ end;
 
 
 
-Procedure IngresadosFecha;
-var Auxhist:unaHistoria;
-    hay_algo:boolean;
-    pedida:TdateTime;
+//...................................................................................................................................................
+//###########################################################################################################################################
+//...............................................................................................................
+
+function menu(version:integer):integer;
 begin
-    pedida:=pedirFecha;
-
-    writeln('---------------------------');
-
-    reset(Ahist);
-    hay_algo:=False;
-    while not eof(Ahist) do
-    begin
-        read(Ahist,Auxhist);
-        if auxhist.fecha_ingreso=pedida then
-        begin
-            hay_algo:=True;
-            writeln(Auxhist.dni,' - ',nomb_enf(Auxhist.cod_enf));
-        end;
-    end;
-    if not hay_algo then writeln('Parece que ningun paciente fue ingresado en esta fecha...');
-
-
-
+            textcolor(4);writeln('-MENU PRINCIPAL-');
+            textcolor(22);
+            writeln('1) Provincias');
+            writeln('2) Sintomas');
+            writeln('3) Enfermedades');
+            writeln('4) Pacientes');
+            writeln('5) Historias Clinicas');
+            writeln('6) Estadisticas');
+            if version=0 then
+            begin
+                writeln('7) Borrar datos (D)');
+                writeln('8) Mostrar datos (D)');
+            end;
+            writeln('0) Fin del Programa');textcolor(7);
+            if version=0 then menu:=int_valido('Ingrese la opcion: ',0,8)
+            else menu:=int_valido('Ingrese la opcion: ',0,6)
 end;
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1405,8 +1441,10 @@ end;
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 BEGIN
 boot;
+
 
 
     //Inicializacion de vairaibles
@@ -1420,19 +1458,8 @@ boot;
     Andando:=True;
     while Andando = True do
         begin
-            textcolor(4);writeln('-MENU PRINCIPAL-');
-            textcolor(22);
-            writeln('1) Provincias');
-            writeln('2) Sintomas');
-            writeln('3) Enfermedades');
-            writeln('4) Pacientes');
-            writeln('5) Historias Clinicas');
-            writeln('6) Estadisticas');
-            writeln('7) Borrar datos (D)');
-            writeln('8) Mostrar datos (D)');
-            writeln('0) Fin del Programa');textcolor(7);
-            Opcion:=int_valido('Ingrese la opcion: ',0,8);//Hay que adaptar esto si sacamos opciones
-            Case Opcion of
+
+            Case menu(0) of
             1: Provincias;
             2: Sintomas;
             3: if (filesize(ASint)<>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
@@ -1449,7 +1476,7 @@ boot;
 
 
             writeln;
-            if(opcion<>0) then
+            if(Andando) then
                 begin
                     writeln('Press any key to continue...');readkey;
                     clrscr;
