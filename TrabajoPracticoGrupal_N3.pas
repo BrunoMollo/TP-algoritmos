@@ -18,7 +18,7 @@ cant_provincias=5;
 cant_sint=20;
 cant_enf=10;
 max_sint=6;
-sint_por_historia=2;
+sint_por_historia=6;
 null=char(0)+char(0)+char(0);
 
 
@@ -117,6 +117,8 @@ begin
 end;
 
 
+
+
 Function rep_sint(reg:unsintoma;campo:integer):boolean; //ingresa un registro de sintoma y el numeor del campo que qeures chequar (1:cod, 2:desc)
 var aux:unsintoma;                                      //Te va a tirar un true si esta repetido el campo, si nada se repita va un false
 begin
@@ -208,6 +210,20 @@ begin
     until eof(Asint) or (mi_sint.cod=cod);
 end;
 
+function nomb_enf(cod:string[3]):string;  //le das un codigo y devuelve el nombre de la enfermedad en cuestion
+var mi_enf:unaEnfermedad;
+begin
+    reset(Aenf);
+    nomb_enf:='/nombre_no_encontrado/';
+    repeat
+        read(Aenf,mi_enf);
+        if mi_enf.cod=cod then nomb_enf:=mi_enf.desc;
+    until (eof(Aenf)) or (mi_enf.cod=cod);
+end;
+
+
+
+
 
 Procedure Mostrar_sint(cod:string[3]);
 var mi_enf:unaEnfermedad;
@@ -297,7 +313,7 @@ end;
 
 
 
-//Funciones de validoacion-###################################################################################################################################
+//Funciones de validacion-###################################################################################################################################
 
 Function string_valido(msn:string; min,max:integer):string;  //FUNCION PARA VALIDAR LOS STRINGS
 begin
@@ -311,7 +327,7 @@ begin
             if min=1 then
                 writeln(' caracter')
             else
-                writeln(' carcteres');
+                writeln(' caracteres');
         end;
 
         if length(string_valido)>max then
@@ -320,7 +336,7 @@ begin
             if max=1 then
                 writeln(' caracter')
             else
-                writeln(' carcteres');
+                writeln(' caracteres');
         end;
     until (length(string_valido)>=min) and (length(string_valido)<=max);
     string_valido:=Uppercase(string_valido);
@@ -438,7 +454,17 @@ begin
 end;
 
 
-
+function pedirFecha:TdateTime;
+var d,m,a:integer;
+begin
+    repeat
+        d:=int_valido('Ingresar dia: ',1,31);
+        m:=int_valido('Ingresar mes: ',1,12);
+        a:=int_valido('Ingresar a'+char(164)+'os: ',0,3000);
+        pedirFecha:=encodeDate(a,m,d);
+        if date_to_str(pedirFecha)<>format ('%d/%d/%d ',[d,m,a]) then writeln(format ('%d/%d/%d ',[d,m,a]),' no existe');
+    until date_to_str(pedirFecha)=format ('%d/%d/%d ',[d,m,a]);
+end;
 
 
 //Procedures--###########################################################################################################################################################
@@ -475,6 +501,7 @@ begin
         rewrite(APac);
     {$I+}
 
+
     assign(AHist,'C:/TP3/Historias.dat');
     {$I-}
     reset(AHist);
@@ -501,6 +528,74 @@ Rewrite(ASint);
 Rewrite(AEnf);
 Rewrite(APac);
 Rewrite(AHist);
+end;
+
+Procedure mostrar_cosas;
+var elec:string;i,j:integer;
+    Prov:unaProvincia;
+    Sint:unSintoma;
+    Enf:unaEnfermedad;
+    Pac:unPaciente;
+    Hist:unaHistoria;
+begin
+    elec:=string_valido('codigo de la bdb: ',0,20);
+    ClrScr;
+    for i:=1 to length(elec) do
+    begin
+        case elec[i] of
+        '1':begin
+                writeln('Provincias');
+                reset(Aprov);
+                while not eof(AProv) do
+                begin
+                    read(AProv,Prov);
+                    writeln(Prov.cod,' - ',Prov.desc);
+                end;
+            end;
+        '2':begin
+                writeln('Sintomas');
+                reset(Asint);
+                while not eof(Asint) do
+                begin
+                    read(Asint,sint);
+                    writeln(sint.cod,' - ',sint.desc);
+                end;
+            end;
+        '3':begin
+                writeln('Enfermedades');
+                reset(Aenf);
+                while not eof(Aenf) do
+                begin
+                    read(Aenf,enf);
+                    write(enf.cod,' - ',enf.desc,' - [');
+                    for j:=1 to max_sint do write(enf.sintomas[j],', ');
+                    writeln(']');
+                end;
+            end;
+        '4':begin
+                writeln('Pacientes');
+                reset(Apac);
+                while not eof(Apac) do
+                begin
+                    read(Apac,pac);
+                    writeln(pac.dni,' - ',pac.edad,' - ',pac.cod_prov,' - ',pac.cant_enf,' - ',pac.dead);
+                end;
+            end;
+        '5':begin
+                writeln('Historias clinicas');
+                reset(Ahist);
+                while not eof(Ahist) do
+                begin
+                    read(Ahist,hist);
+                    write(hist.dni,' - ',hist.cod_enf,' - ',hist.curado,' - (',date_to_str(hist.fecha_ingreso),') - [');
+                    for j:=1 to sint_por_historia do write(hist.sintomas[j],', ');
+                    writeln('] - ',hist.efector);
+                end;
+            end;
+        end;
+        writeln;
+    end;
+
 end;
 
 Procedure ordenar_provincias(c:cod; d:desc; modo:integer);        //MUESTRA LAS PROVINICIAS ORDENADAS,
@@ -556,7 +651,7 @@ var                                     //ver si hay alguna funcion que me sirva
                                         //cod_str_no_repetido?
 i,cont:integer;
 auxiliar:string[3];
-dea:unSintoma;
+SintAux:unSintoma;
 
 begin
 //                  E.sintomas = array [1..max_sint=6]  of string[3]
@@ -566,10 +661,10 @@ begin
         for i:= low(arr) to high(arr) do
         begin
              repeat
-                dea.cod:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',arr);
-                if not rep_sint(dea,1) then writeln('Codigo no existente');
-             until rep_sint(dea,1);
-             arr[i]:=dea.cod;
+                SintAux.cod:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',arr);
+                if not rep_sint(SintAux,1) then writeln('Codigo no existente');
+             until rep_sint(SintAux,1);
+             arr[i]:=SintAux.cod;
 
              if i=high(arr) then writeln('NO se pueden registrar mas de ',i+1,' sintomas');
              if i=filesize(ASint)-1  then
@@ -624,9 +719,58 @@ if filesize(AEnf)<>0 then
 end;
 
 
+Procedure Resumen_sint;
+var i,acum:integer;
+X:unSintoma;
+Y:unaEnfermedad;
+begin
+reset(ASint);
+     while not eof(ASint) do
+           begin
+           acum:=0;
+           read(ASint,X);
+           reset(AEnf);
+           while not eof(AEnf) do
+                 begin
+                 read(AEnf,Y);
+                 for i:=1 to max_sint do
+                     if X.cod = Y.sintomas[i] then
+                     acum:=acum+1;
+                 end;
+           writeln('El sintoma ',x.desc,', codigo ',x.cod,' es presentado por ',acum,' enfermedades');
+           end;
+end;
 
+Procedure Enf_prom;
+var edades,cont:integer;
+X:unPaciente;
+Y:unaEnfermedad;
+Z:unaHistoria;
+begin
+reset(AEnf);
+while not eof(AEnf) do
+begin
+      edades:=0;
+      cont:=0;
+      read(AEnf,Y);
 
-
+      reset(AHist);           //ok
+      while not eof (AHist) do
+            begin
+                 read(AHist,Z);
+                      if Z.cod_enf = Y.cod then
+                      begin
+                           reset(APac);
+                           repeat
+                           read(APac,X);
+                           until Z.dni = X.dni;
+                           edades:=edades+X.edad;
+                           cont:=cont+1;
+                      end;
+            end;
+      if cont<>0 then writeln('El promedio de pacientes con la enfermedad: ',Y.desc,' fue de ',edades/cont:6:1);
+end;
+end;
 
 
 
@@ -1114,6 +1258,25 @@ end;
 //                                                                                          #######################################################################
 
 
+Procedure Agregar_enfermedad(DNI:string[8]);
+var P:unPaciente;
+begin
+
+    P.dni:='banana';//NO hay ningun dni con letras, no introduzca 'banana' como parametro porfa
+    reset(APac);
+    while (not eof(APac)) and (P.dni<>DNI) do
+    begin
+        read(Apac,P);
+        if P.dni=DNI then
+        begin
+            P.cant_enf:=P.cant_enf+1;
+            seek(Apac,filepos(Apac)-1);
+            write(Apac,p);
+        end;
+    end;
+end;
+
+
 
 
 
@@ -1159,6 +1322,7 @@ begin
             begin
                 writeln('NO tenemos registrado esa enfermedad');
                 seguir:=opcion_binaria('Quiere volvear a intentar?(S/N): ','S','N','MAY');
+
             end;
         until (rep_enf(auxEnf,1)) or (seguir='N');
 
@@ -1168,6 +1332,7 @@ begin
             begin
                 auxHist.dni:=auxPac.dni;
                 auxHist.cod_enf:=auxEnf.cod;
+                Agregar_enfermedad(auxHist.dni);
 
                 writeln;
                 Mostrar_sint(auxHist.cod_enf);
@@ -1180,10 +1345,11 @@ begin
 
                 auxHist.efector:=string_valido('Nombre del efector: ',1,30);
 
-                auxHist.fecha_ingreso:=date();
 
+                auxHist.fecha_ingreso:=pedirFecha;
+                {auxHist.fecha_ingreso:=date();
                 writeln;
-                writeln('Se ha registrado esta histoira clinica con la fecha ',date_to_str(auxHist.fecha_ingreso));
+                writeln('Se ha registrado esta histoira clinica con la fecha ',date_to_str(auxHist.fecha_ingreso));}
 
                 seek(Ahist,filesize(Ahist));
                 write(Ahist,auxHist);
@@ -1198,14 +1364,51 @@ begin
 end;
 
 
+
+//                                                                                          #######################################################################
+//##################################################################################################################//////////////////////////////////////////////////
+//                                                                                          #######################################################################
+
+
+
+
+Procedure IngresadosFecha;
+var Auxhist:unaHistoria;
+    hay_algo:boolean;
+    pedida:TdateTime;
+begin
+    pedida:=pedirFecha;
+
+    writeln('---------------------------');
+
+    reset(Ahist);
+    hay_algo:=False;
+    while not eof(Ahist) do
+    begin
+        read(Ahist,Auxhist);
+        if auxhist.fecha_ingreso=pedida then
+        begin
+            hay_algo:=True;
+            writeln(Auxhist.dni,' - ',nomb_enf(Auxhist.cod_enf));
+        end;
+    end;
+    if not hay_algo then writeln('Parece que ningun paciente fue ingresado en esta fecha...');
+
+
+
+end;
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-//PROGRAMA PRINCIPAL---------------------------------------------------------------------------------------------------------------------------------------------
+//PROGRAMA PRINCIPAL-------------------------------------------------hist--------------------------------------------------------------------------------------------
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 BEGIN
 boot;
+
+
     //Inicializacion de vairaibles
     acum_sint:=0;
     acum_enf:=0;
@@ -1225,9 +1428,10 @@ boot;
             writeln('4) Pacientes');
             writeln('5) Historias Clinicas');
             writeln('6) Estadisticas');
-            writeln('7) Borrar datos');
+            writeln('7) Borrar datos (D)');
+            writeln('8) Mostrar datos (D)');
             writeln('0) Fin del Programa');textcolor(7);
-            Opcion:=int_valido('Ingrese la opcion: ',0,7);
+            Opcion:=int_valido('Ingrese la opcion: ',0,8);//Hay que adaptar esto si sacamos opciones
             Case Opcion of
             1: Provincias;
             2: Sintomas;
@@ -1236,6 +1440,7 @@ boot;
             5: if (filesize(Apac)>0)and(filesize(Aenf)>0)then historias else writeln('Tiene que haber datos cargados en Pacientes y en Enfermedades');
             6: Estadisticas;
             7: Borramela;
+            8: mostrar_cosas;
             0: begin
                Andando:=False;
                shutdown;
