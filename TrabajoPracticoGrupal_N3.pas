@@ -14,7 +14,7 @@ Uses CRT,sysutils;
 //Constantes------------------------------------------------------------------------------
 
 Const
-cant_provincias=2;
+cant_provincias=5;
 cant_sint=20;
 cant_enf=10;
 max_sint=6;
@@ -72,7 +72,7 @@ unaHistoria = record
 
 VAR
 //Para el menu principal
-Opcion,h:integer;
+Opcion,q:integer;
 Andando:boolean;
 
 
@@ -87,6 +87,8 @@ matriz_sintomas:matriz;
 P:unaProvincia;
 S:unSintoma;
 E:unaEnfermedad;
+H:unaHistoria;
+C:unPaciente;
 
 AProv:file of unaProvincia;
 ASint:file of unSintoma;
@@ -197,9 +199,6 @@ end;
 
 
 
-
-
-
 function nomb_sint(cod:string[3]):string;  //le das un codigo y devuelve el nombre del sintoma en cuestion
 var mi_sint:unSintoma;
 begin
@@ -259,6 +258,15 @@ begin
         suma:=suma+pacAux.edad;
     end;
     promEdades:=suma/filesize(APac);
+end;
+
+
+Procedure mostrar_Mayor_paciente;
+var veterano:unpaciente;
+begin
+    seek(Apac,0);
+    read(Apac,veterano);
+    writeln('El paciente con mayor edad tiene ',veterano.edad,' y su DNI es ',veterano.dni);
 end;
 
 
@@ -471,38 +479,40 @@ end;
 //Procedures--###########################################################################################################################################################
 
 Procedure boot;
+const dir='C:/TP3';//Carpeta conde se va an a guardar los .dat
 begin
-    CreateDir('C:/TP3');
+    CreateDir(dir);
 
-    assign(AProv,'C:/TP3/Provincias.dat');
+    assign(AProv,dir+'/Provincias.dat');
     {$I-}
     reset(AProv);
     if ioresult=2 then
         rewrite(AProv);
     {$I+}
 
-    assign(AEnf,'C:/TP3/Enfermedades.dat');
+    assign(AEnf,dir+'/Enfermedades.dat');
     {$I-}
     reset(AEnf);
     if ioresult=2 then
         rewrite(AEnf);
     {$I+}
 
-    assign(ASint,'C:/TP3/Sintomas.dat');
+    assign(ASint,dir+'/Sintomas.dat');
     {$I-}
     reset(ASint);
     if ioresult=2 then
         rewrite(ASint);
     {$I+}
 
-    assign(APac,'C:/TP3/Pacientes.dat');
+    assign(APac,dir+'/Pacientes.dat');
     {$I-}
     reset(APac);
     if ioresult=2 then
         rewrite(APac);
     {$I+}
 
-    assign(AHist,'C:/TP3/Historias.dat');
+
+    assign(AHist,dir+'/Historias.dat');
     {$I-}
     reset(AHist);
     if ioresult=2 then
@@ -528,6 +538,74 @@ Rewrite(ASint);
 Rewrite(AEnf);
 Rewrite(APac);
 Rewrite(AHist);
+end;
+
+Procedure mostrar_cosas;
+var elec:string;i,j:integer;
+    Prov:unaProvincia;
+    Sint:unSintoma;
+    Enf:unaEnfermedad;
+    Pac:unPaciente;
+    Hist:unaHistoria;
+begin
+    elec:=string_valido('codigo de la bdb: ',0,20);
+    ClrScr;
+    for i:=1 to length(elec) do
+    begin
+        case elec[i] of
+        '1':begin
+                writeln('Provincias');
+                reset(Aprov);
+                while not eof(AProv) do
+                begin
+                    read(AProv,Prov);
+                    writeln(Prov.cod,' - ',Prov.desc);
+                end;
+            end;
+        '2':begin
+                writeln('Sintomas');
+                reset(Asint);
+                while not eof(Asint) do
+                begin
+                    read(Asint,sint);
+                    writeln(sint.cod,' - ',sint.desc);
+                end;
+            end;
+        '3':begin
+                writeln('Enfermedades');
+                reset(Aenf);
+                while not eof(Aenf) do
+                begin
+                    read(Aenf,enf);
+                    write(enf.cod,' - ',enf.desc,' - [');
+                    for j:=1 to max_sint do write(enf.sintomas[j],', ');
+                    writeln(']');
+                end;
+            end;
+        '4':begin
+                writeln('Pacientes');
+                reset(Apac);
+                while not eof(Apac) do
+                begin
+                    read(Apac,pac);
+                    writeln(pac.dni,' - ',pac.edad,' - ',pac.cod_prov,' - ',pac.cant_enf,' - ',pac.dead);
+                end;
+            end;
+        '5':begin
+                writeln('Historias clinicas');
+                reset(Ahist);
+                while not eof(Ahist) do
+                begin
+                    read(Ahist,hist);
+                    write(hist.dni,' - ',hist.cod_enf,' - ',hist.curado,' - (',date_to_str(hist.fecha_ingreso),') - [');
+                    for j:=1 to sint_por_historia do write(hist.sintomas[j],', ');
+                    writeln('] - ',hist.efector);
+                end;
+            end;
+        end;
+        writeln;
+    end;
+
 end;
 
 Procedure ordenar_provincias(c:cod; d:desc; modo:integer);        //MUESTRA LAS PROVINICIAS ORDENADAS,
@@ -681,10 +759,11 @@ Z:unaHistoria;
 begin
 reset(AEnf);
 while not eof(AEnf) do
-      begin
+begin
       edades:=0;
       cont:=0;
       read(AEnf,Y);
+
       reset(AHist);           //ok
       while not eof (AHist) do
             begin
@@ -699,9 +778,8 @@ while not eof(AEnf) do
                            cont:=cont+1;
                       end;
             end;
-      if cont<>0 then
-      writeln('El promedio de pacientes con la enfermedad: ',Y.desc,' fue de ',edades/cont:6:1);
-      end;
+      if cont<>0 then writeln('El promedio de pacientes con la enfermedad: ',Y.desc,' fue de ',edades/cont:6:1);
+end;
 end;
 
 
@@ -793,7 +871,7 @@ clrscr;
     Writeln;Writeln;
     writeln('El promedio de edades de todos los pacientes atendidos es de: ',PromEdades:6:2);
     writeln('Ya se han curado ',TotalCurados,' pacientes');
-    writeln('El paciente de mayor edad afectado tiene ',mirta.edad,' y su DNI es ',mirta.dni);
+    mostrar_Mayor_paciente;
 end;
 
 
@@ -909,9 +987,59 @@ end;
 //##################################################################################################################//////////////////////////////////////////////////
 //                                                                                          #######################################################################
 
+//PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL
+//PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL
+//PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL
 
+Procedure Busqueda_Letra;
+var acum:integer;
+begin
+    reset(AProv);
+    acum:=0;
+    while not EOF(AProv) do
+        begin
+            read(AProv,P);
+            if P.desc[1] = 'S' then
+                acum:=acum+1;
+        end;
+writeln('La cantidad de provincias que empiezan con la letra S es de: ',acum);
+end;
 
-Procedure Ordenar1;
+Procedure Ordenar(modo:integer);
+var i,j:integer;
+PI,PJ:unaProvincia;
+banana:boolean;
+begin
+    reset(AProv);
+    for i:= 0 to filesize(AProv)-2 do
+        for j:= i+1 to filesize(AProv)-1 do
+            begin
+                seek(AProv,i);
+                read(AProv,PI);
+                seek(AProv,j);
+                read(AProv,PJ);
+                banana:=False;
+                case modo of
+                1: if (PI.cod > PJ.cod) then banana:=True;
+                2: if (PI.desc > PJ.desc) then banana:=True;
+                end;
+                if (banana) then
+                    begin
+                        seek(AProv,i);
+                        write(AProv,PJ);
+                        seek(AProv,j);
+                        write(AProv,PI);
+                    end;
+            end;
+    reset(AProv);
+    for i:= 1 to filesize(AProv) do
+        begin
+            read(AProv,P);
+            writeln(P.cod,'  ','-','  ',P.desc);
+        end;
+end;
+
+{Procedure Ordenar1;
 var i,j:integer;
 PI,PJ:unaProvincia;
 begin
@@ -966,12 +1094,13 @@ begin
             writeln(P.cod,'  ','-','  ',P.desc);
         end;
 end;
+}
 
-
-//PROVINCIAS FINAL?
+//PROVINCIAS FINAL      ----MODULO----
 Procedure Provincias;
 var i:integer;
 begin                           //CARGA DE PROVINCIAS
+    clrscr;
     reset(AProv);
     If not (filesize(AProv) = cant_provincias) then
     begin
@@ -991,21 +1120,138 @@ begin                           //CARGA DE PROVINCIAS
                 write(AProv,P);
             end;
     end
-    else write('Las provincias ya fueron cargadas...');
+    else write('Las provincias ya fueron cargadas...'); writeln();
 
 
 reset(AProv);
     writeln();
-//    write('La cantidad de provincias que empiezan con la letra S es de: ',);   //ACA VA LA FUNCION QUE BUSCA LA LETRA
+    Busqueda_Letra;
+    //write('La cantidad de provincias que empiezan con la letra S es de: ',);
     writeln();writeln();
     writeln('Codigo de provincias ordenado alfabeticamente');
-    Ordenar1;
+    Ordenar(1);
     writeln();
     writeln('Provincias ordenadas alfabeticamente');
-    Ordenar2;
+    Ordenar(2);
+
+end;
+
+//-----------------------------------------------------------------------------------------------------
+
+Procedure Provincia_con_mas_enfermos();
+var i,j,k,l:integer;
+indice,acum:integer;
+codprov:array [1..cant_provincias] of char;
+cont_provincia:array[1..cant_provincias]of integer;
+begin
+    reset(APac);
+    reset(AProv);
+    for k:= 1 to filesize(AProv) do
+        begin
+        read(AProv,P);
+        codprov[k]:=P.cod;
+        cont_provincia[k]:=0;
+        end;
+
+    for i:= 1 to filesize(APac) do
+        begin
+            read(APac,C);
+            for j:= 1 to cant_provincias do
+                begin
+                    if (C.cod_prov = codprov[j]) then
+                        cont_provincia[j]:=cont_provincia[j] + 1;
+                end;
+        end;
+
+    acum:=0;
+    for l:= 1 to cant_provincias do
+        begin
+            if (cont_provincia[l]>acum) then
+                begin
+                acum:=cont_provincia[l];
+                indice:=l;
+                end;
+        end;
+   writeln();
+   writeln('La provincia con mas enfermos es la provincia con codigo ',codprov[indice]);
 
 
 end;
+
+
+
+Procedure IngresadosFecha;
+var Auxhist:unaHistoria;
+    hay_algo:boolean;
+    pedida:TdateTime;
+begin
+    pedida:=pedirFecha;
+
+    writeln('---------------------------');
+
+    reset(Ahist);
+    hay_algo:=False;
+    while not eof(Ahist) do
+    begin
+        read(Ahist,Auxhist);
+        if auxhist.fecha_ingreso=pedida then
+        begin
+            hay_algo:=True;
+            writeln(Auxhist.dni,' - ',nomb_enf(Auxhist.cod_enf));
+        end;
+    end;
+    if not hay_algo then writeln('Parece que ningun paciente fue ingresado en esta fecha...');
+
+end;
+
+
+//--------------------------------------------------
+Procedure Estadisticas();
+var
+working:boolean;
+choice:integer;
+begin
+    working:=True;
+    writeln();
+    while working= True do
+        begin
+            writeln('ESTADISTICAS');
+            writeln('-------------');
+            writeln();
+            writeln('1) Estadisticas de Sintomas');
+            writeln('2) Estadisticas de Enfermedades (Promedio de edad)');
+            writeln('3) Estadisticas de Enfermedades (Pacientes atendidos y curados');
+            writeln('4) Quien fue el mayor atendido y cual es su edad?');
+            writeln('5) Cual fue la provincia que mas enfermos atendio?');
+            writeln('6) Paceintes ingresados en una fecha');
+            writeln('7) Estadisticas de Personas fallecidas');
+            writeln('8) Estadisticas de Pacientes atendidos');
+            writeln('0) Salir');
+            writeln();
+            choice:=int_valido('Ingrese la opcion: ',0,8);
+            Case choice of
+            1: writeln('MOSTRAME');
+            2: writeln('MOSTRAME');
+            3: writeln('MOSTRAME');
+            4: if(filesize(Apac)>0)then mostrar_Mayor_paciente else writeln('No hay paceintes cargados');
+            5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
+            6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
+            7: writeln('MOSTRAME');
+            8: writeln('MOSTRAME');
+            0: working:=False;
+            end;
+            writeln;
+            if(opcion<>0) then
+                begin
+                    writeln('Press any key to continue...');readkey;
+                    clrscr;
+                end;
+
+        end;
+
+end;
+
+
 //-----------------------------------------------------------------------------------
 {Procedure Provincias;       //CARGA DE PROVINCIAS
 var
@@ -1049,7 +1295,35 @@ end;
 //                                                                                          #######################################################################
 
 
+Procedure Agregar_enfermedad(DNI:string[8]);
+var P:unPaciente;
+begin
 
+    P.dni:='banana';//NO hay ningun dni con letras, no introduzca 'banana' como parametro porfa
+    reset(APac);
+    while (not eof(APac)) and (P.dni<>DNI) do
+    begin
+        read(Apac,P);
+        if P.dni=DNI then
+        begin
+            P.cant_enf:=P.cant_enf+1;
+            seek(Apac,filepos(Apac)-1);
+            write(Apac,p);
+        end;
+    end;
+end;
+
+
+
+
+
+
+
+
+
+
+
+//------------------------------------------------------------------------------------------------------------
 
 Procedure historias;
 var auxPac:unpaciente;
@@ -1085,6 +1359,7 @@ begin
             begin
                 writeln('NO tenemos registrado esa enfermedad');
                 seguir:=opcion_binaria('Quiere volvear a intentar?(S/N): ','S','N','MAY');
+
             end;
         until (rep_enf(auxEnf,1)) or (seguir='N');
 
@@ -1094,6 +1369,7 @@ begin
             begin
                 auxHist.dni:=auxPac.dni;
                 auxHist.cod_enf:=auxEnf.cod;
+                Agregar_enfermedad(auxHist.dni);
 
                 writeln;
                 Mostrar_sint(auxHist.cod_enf);
@@ -1133,31 +1409,30 @@ end;
 
 
 
-Procedure IngresadosFecha;
-var Auxhist:unaHistoria;
-    hay_algo:boolean;
-    pedida:TdateTime;
+//...................................................................................................................................................
+//###########################################################################################################################################
+//...............................................................................................................
+
+function menu(version:integer):integer;
 begin
-    pedida:=pedirFecha;
-
-    writeln('---------------------------');
-
-    reset(Ahist);
-    hay_algo:=False;
-    while not eof(Ahist) do
-    begin
-        read(Ahist,Auxhist);
-        if auxhist.fecha_ingreso=pedida then
-        begin
-            hay_algo:=True;
-            writeln(Auxhist.dni,' - ',nomb_enf(Auxhist.cod_enf));
-        end;
-    end;
-    if not hay_algo then writeln('Parece que ningun paciente fue ingresado en esta fecha...');
-
-
-
+            textcolor(4);writeln('-MENU PRINCIPAL-');
+            textcolor(22);
+            writeln('1) Provincias');
+            writeln('2) Sintomas');
+            writeln('3) Enfermedades');
+            writeln('4) Pacientes');
+            writeln('5) Historias Clinicas');
+            writeln('6) Estadisticas');
+            if version=0 then
+            begin
+                writeln('7) Borrar datos (D)');
+                writeln('8) Mostrar datos (D)');
+            end;
+            writeln('0) Fin del Programa');textcolor(7);
+            if version=0 then menu:=int_valido('Ingrese la opcion: ',0,8)
+            else menu:=int_valido('Ingrese la opcion: ',0,6)
 end;
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1166,9 +1441,11 @@ end;
 //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 BEGIN
 boot;
-IngresadosFecha;
+
+
 
     //Inicializacion de vairaibles
     acum_sint:=0;
@@ -1181,25 +1458,16 @@ IngresadosFecha;
     Andando:=True;
     while Andando = True do
         begin
-            textcolor(4);writeln('-MENU PRINCIPAL-');
-            textcolor(22);
-            writeln('1) Provincias');
-            writeln('2) Sintomas');
-            writeln('3) Enfermedades');
-            writeln('4) Pacientes');
-            writeln('5) Historias Clinicas');
-            writeln('6) Estadisticas');
-            writeln('7) Borrar datos');
-            writeln('0) Fin del Programa');textcolor(7);
-            Opcion:=int_valido('Ingrese la opcion: ',0,7);
-            Case Opcion of
+
+            Case menu(0) of
             1: Provincias;
             2: Sintomas;
             3: if (filesize(ASint)<>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
             4: if (filesize(AProv)>0)then Pacientes else writeln('Primero vas a tener que  cargar las provincias');
             5: if (filesize(Apac)>0)and(filesize(Aenf)>0)then historias else writeln('Tiene que haber datos cargados en Pacientes y en Enfermedades');
-            6: enf_prom;//writeln('En construccion');
+            6: Estadisticas;
             7: Borramela;
+            8: mostrar_cosas;
             0: begin
                Andando:=False;
                shutdown;
@@ -1208,16 +1476,16 @@ IngresadosFecha;
 
 
             writeln;
-            if(opcion<>0) then
+            if(Andando) then
                 begin
                     writeln('Press any key to continue...');readkey;
                     clrscr;
                 end;
         end;
 
-for h:= 1 to 5 do
+for q:= 1 to 5 do
 begin
-textcolor(h);writeln('Gracias por utilizar nuestro software :)');
+textcolor(q);writeln('Gracias por utilizar nuestro software :)');
 end;
 readkey;
 END.
