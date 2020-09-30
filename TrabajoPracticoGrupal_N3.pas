@@ -776,8 +776,7 @@ begin
       edades:=0;
       cont:=0;
       read(AEnf,Y);
-
-      reset(AHist);           //ok
+      reset(AHist);
       while not eof (AHist) do
             begin
                  read(AHist,Z);
@@ -1220,8 +1219,27 @@ begin
             writeln();
             choice:=int_valido('Ingrese la opcion: ',0,8);
             Case choice of
-            1: if (filesize (Asint)>0) and (filesize (AEnf)>0)then resumen_sint else writeln('No hay datos cargados para realizar esta opcion');
-            2: if (filesize (AEnf)>0) and (filesize (Ahist)>0) and (filesize(Apac)>0)then enf_prom else writeln('No hay datos cargados para realizar esta opcion');
+            1:if (filesize(ASint)=0) then
+               writeln('No hay sinomas ingresados')
+            else
+
+                     if (filesize(AEnf)=0) then
+                        writeln('No hay enfermedades ingresados')
+                     else
+                         Resumen_sint;
+
+            2: if (filesize(AEnf)=0) then
+               writeln('No hay enfermedades ingresadas')
+            else
+                begin
+                     if (filesize(APac)=0) then
+                        writeln('No hay pacientes ingresados')
+                     else
+                         if (filesize(AHist)=0) then
+                            writeln('No hay historias ingresadas')
+                         else
+                         enf_prom;
+                end;
             3: writeln('MOSTRAME');
             4: if(filesize(Apac)>0)then mostrar_Mayor_paciente else writeln('No hay paceintes cargados');
             5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
@@ -1230,9 +1248,7 @@ begin
             8: if(filesize(Ahist)>0)then nombe_efectores  else writeln('No hay efectores cargados');
             0: working:=False;
             end;
-            writeln;
-            writeln('Press any key to continue...');readkey;
-            if(opcion<>0) then
+           if(choice<>0) then
                 begin
                     writeln('Press any key to continue...');readkey;
                 end;
