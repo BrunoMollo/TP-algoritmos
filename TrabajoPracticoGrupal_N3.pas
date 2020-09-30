@@ -100,7 +100,7 @@ APac:file of unPaciente;
 AHist:file of unaHistoria;
 
 
-//para llevar rregistro de qeu tan cargado estan los arrays
+//para llevar registro de que tan cargado estan los arrays
 acum_sint:integer;
 acum_enf:integer;
 
@@ -223,7 +223,6 @@ begin
         if mi_enf.cod=cod then nomb_enf:=mi_enf.desc;
     until (eof(Aenf)) or (mi_enf.cod=cod);
 end;
-
 
 
 
@@ -777,8 +776,7 @@ begin
       edades:=0;
       cont:=0;
       read(AEnf,Y);
-
-      reset(AHist);           //ok
+      reset(AHist);
       while not eof (AHist) do
             begin
                  read(AHist,Z);
@@ -942,7 +940,6 @@ end;
 //                                                                                          #######################################################################
 
 
-
 Procedure Sintomas;     //CARGA DE SINTOMAS
 var
 a:boolean;
@@ -1053,62 +1050,6 @@ begin
         end;
 end;
 
-{Procedure Ordenar1;
-var i,j:integer;
-PI,PJ:unaProvincia;
-begin
-    reset(AProv);
-    for i:= 0 to filesize(AProv)-2 do
-        for j:= i+1 to filesize(AProv)-1 do
-            begin
-                seek(AProv,i);
-                read(AProv,PI);
-                seek(AProv,j);
-                read(AProv,PJ);
-                if (PI.cod > PJ.cod) then
-                    begin
-                        seek(AProv,i);
-                        write(AProv,PJ);
-                        seek(AProv,j);
-                        write(AProv,PI);
-                    end;
-            end;
-    reset(AProv);
-    for i:= 1 to filesize(AProv) do
-        begin
-            read(AProv,P);
-            writeln(P.cod,'  ','-','  ',P.desc);
-        end;
-end;
-
-Procedure Ordenar2;
-var i,j:integer;
-PI,PJ:unaProvincia;
-begin
-    reset(AProv);
-    for i:= 0 to filesize(AProv)-2 do
-        for j:= i+1 to filesize(AProv)-1 do
-            begin
-                seek(AProv,i);
-                read(AProv,PI);
-                seek(AProv,j);
-                read(AProv,PJ);
-                if (PI.desc > PJ.desc) then
-                    begin
-                        seek(AProv,i);
-                        write(AProv,PJ);
-                        seek(AProv,j);
-                        write(AProv,PI);
-                    end;
-            end;
-    reset(AProv);
-    for i:= 1 to filesize(AProv) do
-        begin
-            read(AProv,P);
-            writeln(P.cod,'  ','-','  ',P.desc);
-        end;
-end;
-}
 
 //PROVINCIAS FINAL      ----MODULO----
 Procedure Provincias;
@@ -1219,6 +1160,7 @@ begin
 
 end;
 
+
 Procedure muertos_por_enf;
 var
 enf: string[20];
@@ -1259,6 +1201,7 @@ end;
 
 
 
+
 Procedure nombe_efectores;
 var
 nom: string[30];
@@ -1290,9 +1233,6 @@ end;
 end;
 
 
-
-
-
 //--------------------------------------------------
 Procedure Estadisticas();
 var
@@ -1319,8 +1259,27 @@ begin
             writeln();
             choice:=int_valido('Ingrese la opcion: ',0,8);
             Case choice of
-            1: writeln('MOSTRAME');
-            2: writeln('MOSTRAME');
+            1:if (filesize(ASint)=0) then
+               writeln('No hay sinomas ingresados')
+            else
+
+                     if (filesize(AEnf)=0) then
+                        writeln('No hay enfermedades ingresados')
+                     else
+                         Resumen_sint;
+
+            2: if (filesize(AEnf)=0) then
+               writeln('No hay enfermedades ingresadas')
+            else
+                begin
+                     if (filesize(APac)=0) then
+                        writeln('No hay pacientes ingresados')
+                     else
+                         if (filesize(AHist)=0) then
+                            writeln('No hay historias ingresadas')
+                         else
+                         enf_prom;
+                end;
             3: writeln('MOSTRAME');
             4: if(filesize(Apac)>0)then mostrar_Mayor_paciente else writeln('No hay paceintes cargados');
             5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
@@ -1329,9 +1288,8 @@ begin
             8: if(filesize(Ahist)>0)then nombe_efectores  else writeln('No hay efectores cargados');
             0: working:=False;
             end;
-            writeln;
-            writeln('Press any key to continue...');readkey;                                                                           //!
-            if(opcion<>0) then
+
+           if(choice<>0) then
                 begin
                     writeln('Press any key to continue...');readkey;
                 end;
@@ -1342,41 +1300,6 @@ end;
 
 
 //-----------------------------------------------------------------------------------
-{Procedure Provincias;       //CARGA DE PROVINCIAS
-var
-acum,i:integer;
-begin
-clrscr;
-
-    //carga
-    acum:=0;
-    for i:= 1 to cant_provincias do
-        begin
-            codprov[i]:= cod_char_no_repetido('Ingrese el codigo de la provincia: ',codprov);
-            detprov[i]:= string_valido('Ingresar nombre de la provincia: ',1,20);
-            detprov[i]:=Uppercase(detprov[i]);
-
-            if (detprov[i][1]='S') then
-                begin
-                acum:=acum+1;
-                end;
-
-            writeln;
-        end;
-
-    //Muestra
-    writeln();
-    writeln('La cantidad de provincias que empiezan con la letra S es de: ',acum);
-    writeln();
-    writeln('Codigo de provincias ordenados alfabeticamente');
-    ordenar_provincias(codprov,detprov,1);
-    writeln();
-    writeln('Provincias ordenadas alfabeticamente');
-    ordenar_provincias(codprov,detprov,2);
-
-end;
-
-}
 
 
 //                                                                                          #######################################################################
