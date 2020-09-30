@@ -1220,6 +1220,41 @@ begin
 end;
 
 
+
+Procedure nombe_efectores;
+var
+nom: string[30];
+cum: integer;
+H:unaHistoria;
+begin
+cum := 0;
+reset(AHist);
+nom:=string_valido('Nombre del efector: ',1,30);
+while not eof(AHist) do
+begin
+     read(AHist,H);
+     if H.efector = nom then
+        begin
+          cum := cum + 1;
+        end;
+end;
+if cum <> 0 then
+begin
+Writeln('El efector ', nom, ' atendio a ', cum, ' pacientes');
+end
+else
+begin
+Writeln('El efector no existe o no atendio a ningun paciente');
+end;
+
+
+
+end;
+
+
+
+
+
 //--------------------------------------------------
 Procedure Estadisticas();
 var
@@ -1253,7 +1288,7 @@ begin
             5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
             6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
             7: writeln('MOSTRAME');
-            8: writeln('MOSTRAME');
+            8: if(filesize(Ahist)>0)then nombe_efectores  else writeln('No hay efectores cargados');
             0: working:=False;
             end;
             writeln;
@@ -1311,6 +1346,18 @@ end;
 //                                                                                          #######################################################################
 
 
+
+
+
+
+
+
+
+
+
+//                                                                                          #######################################################################
+//##################################################################################################################//////////////////////////////////////////////////
+//                                                                                          #######################################################################
 Procedure Agregar_enfermedad(DNI:string[8]);
 var P:unPaciente;
 begin
