@@ -1207,6 +1207,41 @@ begin
 
 end;
 
+//--------------------------------------------------
+Procedure Efectores();
+var nom:string[30];
+cum:integer;
+begin
+    seek(AHist, 0);
+    Writeln('Ingrese nombre del efector');
+    Readln(nom);
+    repeat
+    if (nom <> Ahist.efector) then
+    begin
+        seek(AHist, filepos(AHist) + 1);
+    end
+    until (AHist(eof)) or (nom = AHist.efector);
+
+    if AHist(eof) then
+    begin
+        write('Esa persona no está registrada como efactor o no atendió a ningun paciente');
+    end
+    else
+    begin
+    seek(AHist, 0);
+    repeat
+        if (nom = AHist.efector) then
+        begin
+        cum := cum + 1;
+        seek(AHist, filepos(Ahist) + 1);
+        end;
+    until AHist(eof);
+    Writeln('El efector ', nom, ' atendió a ', cum, ' pacientes');
+   end
+end;
+
+
+
 
 //--------------------------------------------------
 Procedure Estadisticas();
@@ -1240,7 +1275,7 @@ begin
             5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
             6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
             7: writeln('MOSTRAME');
-            8: writeln('MOSTRAME');
+            8: Efectores();//writeln('MOSTRAME');
             0: working:=False;
             end;
             writeln;
