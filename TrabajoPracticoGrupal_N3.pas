@@ -928,8 +928,9 @@ while (a) do      //ACA CARGAMOS LAS ENFERMEDADES
                   a:=false;
 
       end;
+      writeln('');
       resumen_sint;
-writeln;
+
 end;
 
 
