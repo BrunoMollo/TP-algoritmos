@@ -327,28 +327,39 @@ end;
 
 //Funciones de validacion-###################################################################################################################################
 
+Procedure MostrarError(m:string);
+begin
+    ClrEol;
+    textcolor(red);
+    writeln(m);
+    textcolor(LightGray);
+    gotoxy(1,whereY-2);
+    ClrEol;
+end;
+
+
 Function string_valido(msn:string; min,max:integer):string;  //FUNCION PARA VALIDAR LOS STRINGS
 begin
 
     repeat
         write(msn);
         readln(string_valido);
+        ClrEol;//Limpio la linea sigueinte por si hay algun mensaje de error en rojo
         if length(string_valido)<min then
         begin
-            write('No podes ingresar menos de ',min);
+
             if min=1 then
-                writeln(' caracter')
+                MostrarError('No podes ingresar menos de 1 caracter')
             else
-                writeln(' caracteres');
+                MostrarError('No podes ingresar menos de '+intTOStr(min)+' caracteres');
         end;
 
         if length(string_valido)>max then
         begin
-            write('No podes ingresar mas de ',max);
             if max=1 then
-                writeln(' caracter')
+                MostrarError('No podes ingresar mas de 1 caracter')
             else
-                writeln(' caracteres');
+                MostrarError('No podes ingresar mas de '+inttostr(max)+' caracteres');
         end;
     until (length(string_valido)>=min) and (length(string_valido)<=max);
     string_valido:=Uppercase(string_valido);
@@ -369,7 +380,7 @@ begin
                 valido:=False;
             end;
         if not (valido) then
-            writeln(string_num_valido,' no es un numero valido');
+            MostrarError(string_num_valido+' no es un numero valido');
     until valido;
 end;
 
@@ -382,9 +393,9 @@ begin
          str_aux:= string_num_valido(msn,1,9);//Si ingrean un numero de mas de 10 dijitos puede cerrarce el programa, ay que no puede guardar enteros atn grandes
          int_valido:= StrToInt(str_aux);
          if (int_valido<min) then
-            writeln('El numero tiene que ser mayor que ',min);
+            MostrarError('El numero tiene que ser mayor que '+intTostr(min));
          if (int_valido>max) then
-            writeln('El numero tiene que ser menor que ',max);
+            MostrarError('El numero tiene que ser menor que '+intTostr(max));
     until ((int_valido>=min) and (int_valido<=max));
 end;
 
@@ -408,7 +419,7 @@ begin
         else
             begin
             valido:= False;
-            writeln(char_valido,' no es un caracter valido')
+            MostrarError(char_valido+' no es un caracter valido')
             end;
     until valido=True;
 end;
@@ -430,7 +441,7 @@ begin
         if (opcion_binaria<>opcA) and (opcion_binaria<>opcB) then
             begin
               valido:=False;
-              writeln(opcion_binaria,' no es una opcion valida');
+              MostrarError(opcion_binaria+' no es una opcion valida');
             end;
 
     until   valido=True;
@@ -447,7 +458,7 @@ begin
     aux:=string_valido(msn,1,3);
     aux:=Uppercase(aux);
     if (is_in_array(arr,aux)) then
-        writeln('Ya ingresaste ',aux);
+        MostrarError('Ya ingresaste '+aux);
     until not (is_in_array(arr,aux));
    cod_str_no_repetido:=aux;
 end;
@@ -460,7 +471,7 @@ begin
     repeat
     aux:=char_valido(msn,'A','Z','MAY');
     if (is_in_array(arr,aux)) then
-        writeln('Ya ingresaste ',aux);
+        MostrarError('Ya ingresaste '+aux);
     until not (is_in_array(arr,aux));
    cod_char_no_repetido:=aux;
 end;
@@ -675,7 +686,7 @@ begin
         begin
              repeat
                 SintAux.cod:=cod_str_no_repetido('Ingrese el codigo del sintoma: ',arr);
-                if not rep_sint(SintAux,1) then writeln('Codigo no existente');
+                if not rep_sint(SintAux,1) then MostrarError('Codigo no existente');
              until rep_sint(SintAux,1);
              arr[i]:=SintAux.cod;
 
@@ -817,7 +828,7 @@ clrscr;
         //Chequeo que no haya dni repetido
         repeat
             fiambre.dni:=string_num_valido('Ingrese el numero del DNI: ',1,8);
-            if rep_pac(fiambre,1) then writeln('Ya ingresaron ese DNI');
+            if rep_pac(fiambre,1) then MostrarError('Ya ingresaron ese DNI');
         until not rep_pac(fiambre,1);
 
         fiambre.edad:=int_valido('Ingrese la edad del paciente: ',0,125);
@@ -825,7 +836,7 @@ clrscr;
         repeat
             auxprov.cod:=char_valido('Ingrese codigo de provincia: ','A','Z','MAY');
             fiambre.cod_prov:=auxprov.cod;
-            if not rep_prov(auxprov,1) then writeln('Esa provincia no existe');
+            if not rep_prov(auxprov,1) then MostrarError('Esa provincia no existe');
         until rep_prov(auxprov,1);
 
         fiambre.cant_enf:=0;//Empieza en cero, no???
@@ -898,13 +909,13 @@ while (a) do      //ACA CARGAMOS LAS ENFERMEDADES
            seek(AEnf,filesize(AEnf));
            repeat
                 x.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
-                if rep_enf(x,1) then writeln('Ya se cargo ese codigo');
+                if rep_enf(x,1) then MostrarError('Ya se cargo ese codigo');
            until not(rep_enf(x,1));
            E.cod:=x.cod;
 
            repeat
                 x.desc:=string_valido('Ingrese el nombre de la enfermedad: ',1,30);
-                if rep_enf(x,2) then writeln('Ya hay un aenfermedad con ese nombre');
+                if rep_enf(x,2) then MostrarError('Ya hay una enfermedad con ese nombre');
            until not(rep_enf(x,2));
            E.desc:=X.desc;
 
@@ -959,13 +970,13 @@ if (filesize(ASint)=cant_sint) then writeln('La base de datos esta llena');
             seek(ASint,filesize(ASint));
 
             repeat
-            X.cod:=string_valido('Ingrese el codigo del sintoma: ',1,3);
-            if rep_sint(X,1) then writeln('Codigo ya existente');
+                X.cod:=string_valido('Ingrese el codigo del sintoma: ',1,3);
+                if rep_sint(X,1) then MostrarError('Codigo ya existente');
             until not(rep_sint(X,1));
             S.cod:=x.cod;
             repeat
-            X.desc:=string_valido('Ingrese el nombre del sintoma: ', 1,20);
-            if rep_sint(X,2) then writeln('Nombre ya existente');
+                X.desc:=string_valido('Ingrese el nombre del sintoma: ', 1,20);
+                if rep_sint(X,2) then MostrarError('Nombre ya existente');
             until not(rep_sint(X,2));
             S.desc:=x.desc;
             seek(ASint,filepos(ASint));
@@ -1105,20 +1116,21 @@ var i:integer;
 begin                           //CARGA DE PROVINCIAS
     clrscr;
     reset(AProv);
-    If not (filesize(AProv) = cant_provincias) then
+    If (filesize(AProv) < cant_provincias) then
     begin
         write('Ingrese los datos de las provincias');
         writeln();writeln();
-        for i:= 1 to cant_provincias do
+        for i:= filesize(AProv) to cant_provincias-1 do
             begin
                 repeat
+                    seek(AProv,i);
                     P.cod:=char_valido('Codigo de la Provincia: ','A','Z','MAY');
-                    if rep_prov(P,1) then writeln('Ya ingresaste ese codigo');
+                    if rep_prov(P,1) then MostrarError('Ya ingresaste ese codigo');
                 until not rep_prov(P,1);
                 repeat
                     P.desc:=string_valido('Nombre de la provincia: ',1,20);
                     P.desc:=Uppercase(P.desc);
-                    if rep_prov(P,2) then writeln('Ya ingresaste ese nombre');
+                    if rep_prov(P,2) then MostrarError('Ya ingresaste ese nombre');
                 until not rep_prov(P,2);
                 write(AProv,P);
             end;
@@ -1243,6 +1255,41 @@ end;
 
 
 
+
+Procedure nombe_efectores;
+var
+nom: string[30];
+cum: integer;
+H:unaHistoria;
+begin
+cum := 0;
+reset(AHist);
+nom:=string_valido('Nombre del efector: ',1,30);
+while not eof(AHist) do
+begin
+     read(AHist,H);
+     if H.efector = nom then
+        begin
+          cum := cum + 1;
+        end;
+end;
+if cum <> 0 then
+begin
+Writeln('El efector ', nom, ' atendio a ', cum, ' pacientes');
+end
+else
+begin
+Writeln('El efector no existe o no atendio a ningun paciente');
+end;
+
+
+
+end;
+
+
+
+
+
 //--------------------------------------------------
 Procedure Estadisticas();
 var
@@ -1253,6 +1300,7 @@ begin
     writeln();
     while working= True do
         begin
+            clrscr;
             writeln('ESTADISTICAS');
             writeln('-------------');
             writeln();
@@ -1275,14 +1323,14 @@ begin
             5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
             6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
             7: writeln('MOSTRAME');
-            8: Efectores();//writeln('MOSTRAME');
+            8: if(filesize(Ahist)>0)then nombe_efectores  else writeln('No hay efectores cargados');
             0: working:=False;
             end;
             writeln;
+            writeln('Press any key to continue...');readkey;
             if(opcion<>0) then
                 begin
                     writeln('Press any key to continue...');readkey;
-                    clrscr;
                 end;
 
         end;
@@ -1333,6 +1381,18 @@ end;
 //                                                                                          #######################################################################
 
 
+
+
+
+
+
+
+
+
+
+//                                                                                          #######################################################################
+//##################################################################################################################//////////////////////////////////////////////////
+//                                                                                          #######################################################################
 Procedure Agregar_enfermedad(DNI:string[8]);
 var P:unPaciente;
 begin
