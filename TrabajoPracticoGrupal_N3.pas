@@ -1219,6 +1219,44 @@ begin
 
 end;
 
+Procedure muertos_por_enf;
+var
+enf: string[20];
+cum: integer;
+P: unPaciente;
+
+begin
+cum := 0;
+reset(APac);
+enf:=string_valido('Ingese el nombre de la enfermedad: ',1,20);
+while not eof(APac) do
+begin
+     read(APac,P);
+     if P.dead = 'M' then
+        begin
+          cum := cum + 1;
+        end;
+end;
+if cum <> 0 then
+   begin
+     if cum = 1 then
+        begin
+             Writeln(cum, ' persona murio de la enfermedad ', enf);
+        end
+     else
+         begin
+              Writeln(cum, ' personas murieron de la endermedad ', enf);
+         end;
+   end
+else
+    begin
+         Writeln('La enfermedad no existe o no ha matado a ningun paciente');
+    end;
+
+
+
+end;
+
 
 
 Procedure nombe_efectores;
@@ -1229,7 +1267,7 @@ H:unaHistoria;
 begin
 cum := 0;
 reset(AHist);
-nom:=string_valido('Nombre del efector: ',1,30);
+nom:=string_valido('Ingese el nombre del efector: ',1,30);
 while not eof(AHist) do
 begin
      read(AHist,H);
@@ -1287,12 +1325,12 @@ begin
             4: if(filesize(Apac)>0)then mostrar_Mayor_paciente else writeln('No hay paceintes cargados');
             5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
             6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
-            7: writeln('MOSTRAME');
+            7: if(filesize(Ahist)>0)then muertos_por_enf  else writeln('No hay fallecidos cargados');
             8: if(filesize(Ahist)>0)then nombe_efectores  else writeln('No hay efectores cargados');
             0: working:=False;
             end;
             writeln;
-            writeln('Press any key to continue...');readkey;
+            writeln('Press any key to continue...');readkey;                                                                           //!
             if(opcion<>0) then
                 begin
                     writeln('Press any key to continue...');readkey;
