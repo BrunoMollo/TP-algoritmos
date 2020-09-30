@@ -766,8 +766,7 @@ begin
       edades:=0;
       cont:=0;
       read(AEnf,Y);
-
-      reset(AHist);           //ok
+      reset(AHist);
       while not eof (AHist) do
             begin
                  read(AHist,Z);
