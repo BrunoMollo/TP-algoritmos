@@ -546,12 +546,15 @@ end;
 
 Procedure borramela; //esto esta para debugear, la idea es que no este en le programa final
 begin
-writeln('La base de datos ha fallecido');
-Rewrite(AProv);
-Rewrite(ASint);
-Rewrite(AEnf);
-Rewrite(APac);
-Rewrite(AHist);
+if opcion_binaria('ESTAS SEGURO???','S','N','MAY')='S' then
+begin
+    writeln('La base de datos ha fallecido');
+    Rewrite(AProv);
+    Rewrite(ASint);
+    Rewrite(AEnf);
+    Rewrite(APac);
+    Rewrite(AHist);
+end;
 end;
 
 Procedure mostrar_cosas;
@@ -1255,7 +1258,7 @@ begin
                 begin
                      salida1:= false;
                      reset(APac);
-                     While salida1 = false do
+                     While (salida1=false) and not(eof(APac)) do
                      begin
                      Read(Apac, P);
                           if H.DNI = P.DNI then                                     //si el DNI de esa historia coincide con el de algun paciente
@@ -1357,8 +1360,7 @@ begin
             8: if(filesize(Ahist)>0)then nombe_efectores  else writeln('No hay efectores cargados');
             0: working:=False;
             end;
-            writeln;
-            writeln('Press any key to continue...');readkey;                                                                           //!
+            writeln;                                                                        //!
             if(choice<>0) then
                 begin
                     writeln('Press any key to continue...');readkey;
