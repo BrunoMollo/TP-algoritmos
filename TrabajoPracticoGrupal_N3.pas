@@ -1247,7 +1247,7 @@ begin
             5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
             6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
             7: writeln('MOSTRAME');
-            8: if(filesize(Ahist)>0)then nombe_efectores  else writeln('No hay efectores cargados');
+            8: if(filesize(Ahist)>0)then nombre_efectores  else writeln('No hay efectores cargados');
             0: working:=False;
             end;
            if(choice<>0) then
