@@ -199,9 +199,6 @@ begin
     end;
 end;
 
-
-
-
 function nomb_sint(cod:string[3]):string;  //le das un codigo y devuelve el nombre del sintoma en cuestion
 var mi_sint:unSintoma;
 begin
@@ -286,9 +283,6 @@ begin
 end;
 
 
-
-
-
 //Los is_in_array--#################################################################################################################################
 
 
@@ -319,11 +313,6 @@ begin
             end;
         end;
 end;
-
-
-
-
-
 
 //Funciones de validacion-###################################################################################################################################
 
@@ -446,8 +435,6 @@ begin
 
     until   valido=True;
 end;
-
-
 
 
 Function cod_str_no_repetido(msn:string; arr:array of string[3]):string[3];     //FUNCION PARA VERIFICAR QUE NO SE REPITE UN CODIGO
@@ -663,6 +650,7 @@ begin
         arr[i]:=null;//null son tres caracteres nulos
 end;
 
+
 Procedure limpiar_char(var arr:array of char);     //LIMPIA LOS ARREGLOS
 var
 i:integer;
@@ -670,7 +658,6 @@ begin
     for i:= low(arr) to high(arr) do
         arr[i]:=char(0);
 end;
-
 
 
 Procedure sint_enf(var arr:array of string[3]);//capas que tendraimos que cambairle el nombre a este procedure, ahora se usa en hiitorias tmb
@@ -708,26 +695,6 @@ begin
 writeln(' ');
 end;
 
-
-{Procedure Mostrar_sintomas;   //Este procedure ese para el chapin enfermedades
-var i,j,k,acum:integer;
-begin
-reset(ASint);
-reset(AEnf);
-while not eof(ASint) do
-      begin
-      read(Asint,S);
-      writeln('El sintoma con el codigo ',S.cod,' es ',S.desc);
-      acum:=0;
-      while not eof(AEnf)do
-          begin
-              read(AEnf,E);
-              for i:= 1 to max_sint do
-              if (E.sintomas[i]=S.cod) then acum:=acum+1;
-          end;
-          writeln('Las enfermedades que la presentan son: ',acum);
-      end;
-end; }
 
 Procedure Mostrar_enfermedades;   //Este procedure ese para el chapin enfermedades
 begin
@@ -813,8 +780,6 @@ var
 fiambre,mirta:unpaciente;
 auxprov:unaprovincia;
 
-{sanos:integer;}
-{curado:char;}
 begin
 clrscr;
     //El mas viejo va a estar primero, entonces lo bajo
@@ -823,11 +788,8 @@ clrscr;
     else mirta.edad:=0;
 
 
-
-    {sanos:=0; }
-
     repeat
-        writeln;
+        //writeln;
         //Chequeo que no haya dni repetido
         repeat
             fiambre.dni:=string_num_valido('Ingrese el numero del DNI: ',1,8);
@@ -937,9 +899,6 @@ while (a) do      //ACA CARGAMOS LAS ENFERMEDADES
       resumen_sint;
 
 end;
-
-
-
 
 
 //                                                                                          #######################################################################
@@ -1058,63 +1017,6 @@ begin
         end;
 end;
 
-{Procedure Ordenar1;
-var i,j:integer;
-PI,PJ:unaProvincia;
-begin
-    reset(AProv);
-    for i:= 0 to filesize(AProv)-2 do
-        for j:= i+1 to filesize(AProv)-1 do
-            begin
-                seek(AProv,i);
-                read(AProv,PI);
-                seek(AProv,j);
-                read(AProv,PJ);
-                if (PI.cod > PJ.cod) then
-                    begin
-                        seek(AProv,i);
-                        write(AProv,PJ);
-                        seek(AProv,j);
-                        write(AProv,PI);
-                    end;
-            end;
-    reset(AProv);
-    for i:= 1 to filesize(AProv) do
-        begin
-            read(AProv,P);
-            writeln(P.cod,'  ','-','  ',P.desc);
-        end;
-end;
-
-Procedure Ordenar2;
-var i,j:integer;
-PI,PJ:unaProvincia;
-begin
-    reset(AProv);
-    for i:= 0 to filesize(AProv)-2 do
-        for j:= i+1 to filesize(AProv)-1 do
-            begin
-                seek(AProv,i);
-                read(AProv,PI);
-                seek(AProv,j);
-                read(AProv,PJ);
-                if (PI.desc > PJ.desc) then
-                    begin
-                        seek(AProv,i);
-                        write(AProv,PJ);
-                        seek(AProv,j);
-                        write(AProv,PI);
-                    end;
-            end;
-    reset(AProv);
-    for i:= 1 to filesize(AProv) do
-        begin
-            read(AProv,P);
-            writeln(P.cod,'  ','-','  ',P.desc);
-        end;
-end;
-}
-
 //PROVINCIAS FINAL      ----MODULO----
 Procedure Provincias;
 var i:integer;
@@ -1146,7 +1048,6 @@ begin                           //CARGA DE PROVINCIAS
 reset(AProv);
     writeln();
     Busqueda_Letra;
-    //write('La cantidad de provincias que empiezan con la letra S es de: ',);
     writeln();writeln();
     writeln('Codigo de provincias ordenado alfabeticamente');
     Ordenar(1);
@@ -1199,7 +1100,6 @@ begin
 end;
 
 
-
 Procedure IngresadosFecha;
 var Auxhist:unaHistoria;
     hay_algo:boolean;
@@ -1207,7 +1107,10 @@ var Auxhist:unaHistoria;
 begin
     pedida:=pedirFecha;
 
-    writeln('---------------------------');
+    writeln();
+    writeln('------------------------------------');
+    writeln('  DNI  ','      ','Nombre de la enfermedad');
+    writeln('------------------------------------');
 
     reset(Ahist);
     hay_algo:=False;
@@ -1217,7 +1120,7 @@ begin
         if auxhist.fecha_ingreso=pedida then
         begin
             hay_algo:=True;
-            writeln(Auxhist.dni,' - ',nomb_enf(Auxhist.cod_enf));
+            writeln(Auxhist.dni,' ',' - ',' ',nomb_enf(Auxhist.cod_enf));
         end;
     end;
     if not hay_algo then writeln('Parece que ningun paciente fue ingresado en esta fecha...');
@@ -1271,7 +1174,7 @@ begin
                                      end;
                               end;
 
-                     end;                                                                        //resetea los pacientes y busca otra historia en la que aparezca la enfermedad
+                     end;                                                        //resetea los pacientes y busca otra historia en la que aparezca la enfermedad
                 end;
             end;
          end;
@@ -1288,9 +1191,7 @@ end;
 //...........................................................................
 
 
-
-
-Procedure nombe_efectores;
+Procedure nombre_efectores;
 var
 nom: string[30];
 cum: integer;
@@ -1321,9 +1222,6 @@ end;
 end;
 
 
-
-
-
 //--------------------------------------------------
 Procedure Estadisticas();
 var
@@ -1343,25 +1241,43 @@ begin
             writeln('3) Estadisticas de Enfermedades (Pacientes atendidos y curados');
             writeln('4) Quien fue el mayor atendido y cual es su edad?');
             writeln('5) Cual fue la provincia que mas enfermos atendio?');
-            writeln('6) Paceintes ingresados en una fecha');
+            writeln('6) Pacientes ingresados en una fecha');
             writeln('7) Estadisticas de Personas fallecidas');
             writeln('8) Estadisticas de Pacientes atendidos');
             writeln('0) Salir');
             writeln();
             choice:=int_valido('Ingrese la opcion: ',0,8);
             Case choice of
-            1: writeln('MOSTRAME');
-            2: writeln('MOSTRAME');
+            1:if (filesize(ASint)=0) then
+               writeln('No hay sinomas ingresados')
+            else
+
+                     if (filesize(AEnf)=0) then
+                        writeln('No hay enfermedades ingresados')
+                     else
+                         Resumen_sint;
+
+            2: if (filesize(AEnf)=0) then
+               writeln('No hay enfermedades ingresadas')
+            else
+                begin
+                     if (filesize(APac)=0) then
+                        writeln('No hay pacientes ingresados')
+                     else
+                         if (filesize(AHist)=0) then
+                            writeln('No hay historias ingresadas')
+                         else
+                         enf_prom;
+                end;
             3: writeln('MOSTRAME');
             4: if(filesize(Apac)>0)then mostrar_Mayor_paciente else writeln('No hay paceintes cargados');
             5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
             6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
-            7: if(filesize(Ahist)>0)then muertos_por_enf  else writeln('No hay fallecidos cargados');
-            8: if(filesize(Ahist)>0)then nombe_efectores  else writeln('No hay efectores cargados');
+            7: writeln('MOSTRAME');
+            8: if(filesize(Ahist)>0)then nombre_efectores  else writeln('No hay efectores cargados');
             0: working:=False;
             end;
-            writeln;                                                                        //!
-            if(choice<>0) then
+           if(choice<>0) then
                 begin
                     writeln('Press any key to continue...');readkey;
                 end;
@@ -1372,41 +1288,7 @@ end;
 
 
 //-----------------------------------------------------------------------------------
-{Procedure Provincias;       //CARGA DE PROVINCIAS
-var
-acum,i:integer;
-begin
-clrscr;
 
-    //carga
-    acum:=0;
-    for i:= 1 to cant_provincias do
-        begin
-            codprov[i]:= cod_char_no_repetido('Ingrese el codigo de la provincia: ',codprov);
-            detprov[i]:= string_valido('Ingresar nombre de la provincia: ',1,20);
-            detprov[i]:=Uppercase(detprov[i]);
-
-            if (detprov[i][1]='S') then
-                begin
-                acum:=acum+1;
-                end;
-
-            writeln;
-        end;
-
-    //Muestra
-    writeln();
-    writeln('La cantidad de provincias que empiezan con la letra S es de: ',acum);
-    writeln();
-    writeln('Codigo de provincias ordenados alfabeticamente');
-    ordenar_provincias(codprov,detprov,1);
-    writeln();
-    writeln('Provincias ordenadas alfabeticamente');
-    ordenar_provincias(codprov,detprov,2);
-
-end;
-
-}
 
 
 //                                                                                          #######################################################################
@@ -1443,15 +1325,6 @@ begin
         end;
     end;
 end;
-
-
-
-
-
-
-
-
-
 
 
 //------------------------------------------------------------------------------------------------------------
