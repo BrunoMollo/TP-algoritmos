@@ -1060,21 +1060,21 @@ end;
 //-----------------------------------------------------------------------------------------------------
 
 Procedure Provincia_con_mas_enfermos();
-var i,j,k,l:integer;
-indice,acum:integer;
+var i,j,k,l,m:integer;
+indice,indicex,acum2,acum:integer;
 codprov:array [1..cant_provincias] of char;
 cont_provincia:array[1..cant_provincias]of integer;
 begin
     reset(APac);
     reset(AProv);
-    for k:= 1 to filesize(AProv) do
+    for k:= 1 to filesize(AProv) do                  //SE PASA A UN ARRAY LAS PROVINCIAS
         begin
         read(AProv,P);
         codprov[k]:=P.cod;
         cont_provincia[k]:=0;
         end;
 
-    for i:= 1 to filesize(APac) do
+    for i:= 1 to filesize(APac) do                 //SE VA SUMANDO LA CANTIDAD DE ENFERMOS POR PROVINCIAS EN EL ARRAY AUXILIAR
         begin
             read(APac,C);
             for j:= 1 to cant_provincias do
@@ -1085,7 +1085,7 @@ begin
         end;
 
     acum:=0;
-    for l:= 1 to cant_provincias do
+    for l:= 1 to cant_provincias do               //BUSCO LA MAYOR Y GUARDO LA LETRA
         begin
             if (cont_provincia[l]>acum) then
                 begin
@@ -1093,8 +1093,21 @@ begin
                 indice:=l;
                 end;
         end;
+
+    acum2:=0;
+    for m:= 1 to cant_provincias do                //BUSCO SI HAY OTRA QUE SEA IGUAL Y ESTE EMPATADA
+        begin
+            if (acum = cont_provincia[m]) then
+                begin
+                acum2:=cont_provincia[m];
+                indicex:=m;
+                end;
+        end;
+
    writeln();
    writeln('La provincia con mas enfermos es la provincia con codigo ',codprov[indice]);
+   if (acum2<>0) and not (indicex = indice) then writeln('Y esta empatada con la provincia con codigo ',codprov[indicex]);
+
 
 
 end;
