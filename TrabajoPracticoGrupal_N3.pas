@@ -1430,10 +1430,80 @@ end;
 //###########################################################################################################################################
 //...............................................................................................................
 
+const
+cant_opciones=6;//No cuenta salir
+enter=char(13);
+arriba=char(80);
+abajo=char(72);
+type
+arr_opc=array[0..cant_opciones] of string[2];
+
+
+
+procedure mover_flecha(var op:arr_opc; pos:integer);
+var i:integer;
+begin
+    for i:=0 to cant_opciones do op[i]:='  ';
+    op[pos]:='<-';
+end;
+
+
+procedure detectar_flechas(var x:integer;elegida:char;min,max:integer);
+begin
+          //0->1->4->3->2->1->0
+          if (elegida=arriba)or (elegida='s') or (elegida='S') then
+          begin
+             x:=x+1;
+             if x>max then x:=min;
+          end
+          //1->2->3->4->1
+          else if (elegida=abajo) or (elegida='w') or (elegida='W')  then
+          begin
+             x:=x-1;
+             if x<min then x:=max;
+          end;
+end;
+
+
+function menu_copado:integer;
+var
+op:arr_opc;
+pos_actual:integer;
+elegida:char;
+begin
+    pos_actual:=1;
+
+    repeat
+        textcolor(4);writeln('-MENU PRINCIPAL-');textcolor(22);
+         mover_flecha(op,pos_actual);
+          writeln('Provincias ',op[1]);
+          writeln('Sintomas ',op[2]);
+          writeln('Enfermedades',op[3]);
+          writeln('Pacientes ',op[4]);
+          writeln('Historias clinicas ',op[5]);
+          writeln('Estadisticas',op[6]);
+          writeln('Salir ',op[0]);
+          textcolor(7);
+
+          elegida:=readkey;
+          detectar_flechas(pos_actual,elegida,0,cant_opciones);
+
+
+          clrscr;
+
+
+    until elegida=enter;
+
+    menu_copado:=pos_actual;
+end;
+
+
+//--<
 function menu(version:integer):integer;
 begin
-            textcolor(4);writeln('-MENU PRINCIPAL-');
-            textcolor(22);
+    if (version=1) or (version=0) then
+    begin
+            textcolor(4);writeln('-MENU PRINCIPAL-');textcolor(22);
             writeln('1) Provincias');
             writeln('2) Sintomas');
             writeln('3) Enfermedades');
@@ -1448,6 +1518,9 @@ begin
             writeln('0) Fin del Programa');textcolor(7);
             if version=0 then menu:=int_valido('Ingrese la opcion: ',0,8)
             else menu:=int_valido('Ingrese la opcion: ',0,6)
+    end
+    else if version=2 then menu:=menu_copado;
+
 end;
 
 
@@ -1500,7 +1573,7 @@ boot;
                 end;
         end;
 
-for q:= 1 to 5 do
+for q:= 1 to 500 do
 begin
 textcolor(q);writeln('Gracias por utilizar nuestro software :)');
 end;
