@@ -796,6 +796,29 @@ begin
 end;
 end;
 
+Procedure orden_por_edad;
+var
+A, B: unPaciente
+i, j: integer
+begin
+reset(Apac);
+for i:= 0 to filesize(Apac) - 2 do
+    for j:= i+1 to filesize(Apac)-1 do
+        begin
+             seek(APac, i);
+             Read(APac, A);
+             seek(APac, j);
+             Read(APac, B);
+             if A.edad < B.edad
+                then
+                    begin
+                         seek(APac, i);
+                         Write(APac, B);
+                         seek(APac, j);
+                         Write(APac, A);
+                    end;
+        end;
+end;
 
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1238,7 +1261,7 @@ reset(AEnf);
 salida1:= false;
 
 enf:=string_valido('Ingese el nombre de la enfermedad: ',1,20);                     //ingresa el nombre de la enf
-
+                                                                                                                                                                   //reads!!!
 while not eof(AEnf) do
 begin
      Read(Aenf, E);
