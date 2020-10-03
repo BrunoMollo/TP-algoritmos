@@ -790,6 +790,31 @@ for i:= 0 to filesize(Apac) - 2 do
         end;
 end;
 
+Procedure orden_por_edad;
+var
+A, B: unPaciente;
+i, j: integer;
+begin
+reset(Apac);
+for i:= 0 to filesize(Apac) - 2 do
+    for j:= i+1 to filesize(Apac)-1 do
+        begin
+             seek(APac, i);
+             Read(APac, A);
+             seek(APac, j);
+             Read(APac, B);
+             if A.edad < B.edad
+                then
+                    begin
+                         seek(APac, i);
+                         Write(APac, B);
+                         seek(APac, j);
+                         Write(APac, A);
+                    end;
+        end;
+end;
+
+
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //################################################################################################################################################
@@ -800,19 +825,14 @@ end;
 
 Procedure Pacientes;        //INGRESO DE PACIENTES
 var
-fiambre,mirta:unpaciente;
+fiambre:unpaciente;
 auxprov:unaprovincia;
 
 begin
 clrscr;
-    //El mas viejo va a estar primero, entonces lo bajo
-    seek(APac,0);
-    if(filesize(APac)<>0) then read(APac,mirta)
-    else mirta.edad:=0;
-
 
     repeat
-        //writeln;
+        writeln;
         //Chequeo que no haya dni repetido
         repeat
             fiambre.dni:=string_num_valido('Ingrese el numero del DNI: ',1,8);
@@ -830,45 +850,14 @@ clrscr;
         fiambre.cant_enf:=0;//Empieza en cero, no???
         fiambre.dead:=opcion_binaria('Esta vivo o Muerto? (M/V) ','M','V','MAY');//hay que preguntar esto o va vivo por defecto????
 
-
-        if (filesize(APac)=0) then
-        begin
-            //Es el mas viejo porqeu llego primero
-            mirta.dni:=fiambre.dni;
-            mirta.edad:=fiambre.edad;
-            mirta.cod_prov:=fiambre.cod_prov;
-            mirta.cant_enf:=fiambre.cant_enf;
-            mirta.dead:=fiambre.dead;
-
-            write(APac,fiambre);
-        end
-        else
-        begin
-            if (fiambre.edad>mirta.edad) then
-                begin
-                    seek(APac,filesize(APac));
-                    write(Apac,mirta);//escribo al destronado al final
-
-                    //Efiambre se confierte en la nueva mirta
-                    mirta.dni:=fiambre.dni;
-                    mirta.edad:=fiambre.edad;
-                    mirta.cod_prov:=fiambre.cod_prov;
-                    mirta.cant_enf:=fiambre.cant_enf;
-                    mirta.dead:=fiambre.dead;
-
-                    seek(APac,0);
-                    write(APac,mirta);//Escribo el nuvo record al principio
-
-                end
-            else
-                begin
-                    seek(APac,filesize(APac));
-                    write(Apac,fiambre);
-                end;
-        end;
+        seek(Apac,filesize(Apac));
+        write(Apac,fiambre);
 
 
     until opcion_binaria('Desea ingresar otro paciente? (S/N) ','S','N','MAY')='N';
+
+
+    orden_por_edad;
 
     Writeln;Writeln;
     writeln('El promedio de edades de todos los pacientes atendidos es de: ',PromEdades:6:2);
@@ -1203,7 +1192,7 @@ begin
                           if H.DNI = P.DNI then                                     //si el DNI de esa historia coincide con el de algun paciente
                               begin
 
-                                  if P.dead = 'M' then                           //si el paciente está muerto
+                                  if P.dead = 'M' then                           //si el paciente est?muerto
                                      begin                                          //se cuenta
                                           cum:= cum + 1;
                                           salida1:= true;
@@ -1596,9 +1585,10 @@ boot;
                 end;
         end;
 
-for q:= 1 to 500 do
+for q:= 1 to 300 do
 begin
-textcolor(q);writeln('Gracias por utilizar nuestro software :)');
+textcolor(q);writeln('Gracias por utilizar nuestro software :)':(q*4) mod 100);
+delay(1);
 end;
 readkey;
 END.
