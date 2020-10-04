@@ -768,30 +768,6 @@ end;
 
 Procedure orden_por_edad;
 var
-A, B: unPaciente
-i, j: integer
-begin
-reset(Apac);
-for i:= 0 to filesize(Apac) - 2 do
-    for j:= i+1 to filesize(Apac)-1 do
-        begin
-             seek(APac, i);
-             Read(APac, A);
-             seek(APac, j);
-             Read(APac, B);
-             if A.edad < B.edad
-                then
-                    begin
-                         seek(APac, i);
-                         Write(APac, B);
-                         seek(APac, j);
-                         Write(APac, A);
-                    end;
-        end;
-end;
-
-Procedure orden_por_edad;
-var
 A, B: unPaciente;
 i, j: integer;
 begin
@@ -803,8 +779,7 @@ for i:= 0 to filesize(Apac) - 2 do
              Read(APac, A);
              seek(APac, j);
              Read(APac, B);
-             if A.edad < B.edad
-                then
+             if A.edad < B.edad then
                     begin
                          seek(APac, i);
                          Write(APac, B);
@@ -813,6 +788,59 @@ for i:= 0 to filesize(Apac) - 2 do
                     end;
         end;
 end;
+
+
+Procedure mostrar_mirta;
+var
+P1, P2: unPaciente;
+cum: integer;
+i: integer;
+begin
+cum := 1;
+reset(APac);
+Read(APac, P1);
+Read(APac, P2);
+While P1.edad = P2.edad do
+      begin
+           cum := cum + 1;
+           Read(APac, P2);
+      end;
+Reset(APac);
+if cum <> 1 then
+   begin
+        Write('Los pacientes con el DNI ');
+        for i:= 0 to cum - 1 do
+            begin
+                 Read(APac, p1);
+                 Write(P1.DNI);
+                 if i <> cum -2 then
+                    begin
+                         if i = cum - 1 then
+                            begin
+                            write('');
+                            end
+                            else
+                            begin
+                                 write(', ');
+                            end;
+                    end
+                    else
+                    begin
+                      write(' y ');
+                    end;
+            end;
+
+        Writeln(' son los mayores, y tienen ', p1.edad, ' a�os');
+   end
+   else
+   begin
+        Writeln('El paciente con el DNI ', P1.DNI, ' es el mayor con ', P1.edad, ' a�os');
+   end;
+
+end;
+
+
+
 
 
 
@@ -862,7 +890,8 @@ clrscr;
     Writeln;Writeln;
     writeln('El promedio de edades de todos los pacientes atendidos es de: ',PromEdades:6:2);
     writeln('Ya se han curado ',TotalCurados,' pacientes');
-    mostrar_Mayor_paciente;
+    orden_por_edad;
+    mostrar_mirta;
 end;
 
 
@@ -1242,8 +1271,68 @@ begin
 Writeln('El efector no existe o no atendio a ningun paciente');
 end;
 
+end;
 
 
+
+
+Procedure curados_por_enf;
+var
+cumAT, cumCU: integer;
+H:unaHistoria;
+E:unaEnfermedad;
+
+begin;
+reset(AEnf);
+While not eof(AEnf) do                                                              //Cada enfermedad
+      begin
+           Read(AEnf, E);
+           reset(AHist);
+           cumAT:= 0;
+           cumCU:= 0;
+           While not eof(AHist) do                                                  //Pacientes atendidos
+                 begin
+                      Read(AHist, H);
+                      if E.cod = H.cod_enf then
+                         begin
+                              cumAT:= cumAT + 1;                                     //Si encuentra el mismo codigo el la historia se atendio al paciente
+                              if H.curado = 'S' then cumCU:= cumCU + 1;
+                         end
+                         else
+                 end;
+           if cumAT = 0 then                                                                   //no encontro nadie con la enfermedad actual
+              begin
+                   Writeln('Ningun paciente atendido contrajo la enfermedad ', E.desc);
+              end
+              else
+              begin
+           if cumAT = 1 then
+              begin
+                   write(cumAT, ' paciente contrajo la enfermedad ', E.desc);
+                   if cumCU = 0 then
+                      begin
+                           writeln(' pero no se ha curado');
+                      end
+                      else
+                      begin
+                           writeln('y se ha curado');
+                      end;
+              end
+              else
+              begin
+                   write(cumAT, ' pacientes contrajeron la enfermedad ', E.desc);
+                   if cumCU = 0 then
+                      begin
+                           writeln(' pero ninguno se ha curado');
+                      end
+                      else
+                      begin
+                           writeln(' y ', cumCU, ' se han curado');
+                      end;
+              end;
+              end;
+              Writeln('----------------------------------------------------------------------------------');
+      end;
 end;
 
 
@@ -1273,6 +1362,7 @@ begin
             writeln();
             choice:=int_valido('Ingrese la opcion: ',0,8);
             Case choice of
+
             1:if (filesize(ASint)=0) then
                writeln('No hay sinomas ingresados')
             else
@@ -1294,9 +1384,10 @@ begin
                          else
                          enf_prom;
                 end;
-            3: writeln('MOSTRAME');
+            3: if(filesize(AEnf)>0)then curados_por_enf else writeln('No hay enfermedades cargadas')
+
             4: if(filesize(Apac)>0)then mostrar_Mayor_paciente else writeln('No hay paceintes cargados');
-            5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
+            5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay pacientes cargados');  //Si hay paceintes, hay provincias
             6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
             7: writeln('MOSTRAME');
             8: if(filesize(Ahist)>0)then nombre_efectores  else writeln('No hay efectores cargados');
