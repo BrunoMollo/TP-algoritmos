@@ -1386,13 +1386,68 @@ begin
 Writeln('El efector no existe o no atendio a ningun paciente');
 end;
 
-
-
 end;
 
 
 
+Procedure curados_por_enf;
+var
+cumAT, cumCU: integer;
+H:unaHistoria;
+E:unaEnfermedad;
 
+begin;
+reset(AEnf);
+While not eof(AEnf) do                                                              //Cada enfermedad
+      begin
+           Read(AEnf, E);
+           reset(AHist);
+           cumAT:= 0;
+           cumCU:= 0;
+           While not eof(AHist) do                                                  //Pacientes atendidos
+                 begin
+                      Read(AHist, H);
+                      if E.cod = H.cod_enf then
+                         begin
+                              cumAT:= cumAT + 1;                                     //Si encuentra el mismo codigo el la historia se atendio al paciente
+                              if H.curado = 'S' then cumCU:= cumCU + 1;
+                         end
+                         else
+                 end;
+           if cumAT = 0 then                                                                   //no encontro nadie con la enfermedad actual
+              begin
+                   Writeln('Ningun paciente atendido contrajo la enfermedad ', E.desc);
+              end
+              else
+              begin
+           if cumAT = 1 then
+              begin
+                   write(cumAT, ' paciente contrajo la enfermedad ', E.desc);
+                   if cumCU = 0 then
+                      begin
+                           writeln(' pero no se ha curado');
+                      end
+                      else
+                      begin
+                           writeln('y se ha curado');
+                      end;
+              end
+              else
+              begin
+                   write(cumAT, ' pacientes contrajeron la enfermedad ', E.desc);
+                   if cumCU = 0 then
+                      begin
+                           writeln(' pero ninguno se ha curado');
+                      end
+                      else
+                      begin
+                           writeln(' y ', cumCU, ' se han curado');
+                      end;
+              end;
+              end;
+              Writeln('----------------------------------------------------------------------------------');
+      end;
+end;
 
 //--------------------------------------------------
 Procedure Estadisticas();
@@ -1422,7 +1477,7 @@ begin
             Case choice of
             1: writeln('MOSTRAME');
             2: writeln('MOSTRAME');
-            3: writeln('MOSTRAME');
+            3: if(filesize(AEnf)>0)then curados_por_enf else writeln('No hay enfermedades cargadas');
             4: if(filesize(Apac)>0)then mostrar_Mayor_paciente else writeln('No hay paceintes cargados');
             5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
             6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
