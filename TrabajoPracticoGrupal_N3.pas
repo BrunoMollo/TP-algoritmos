@@ -798,8 +798,8 @@ end;
 
 Procedure orden_por_edad;
 var
-A, B: unPaciente
-i, j: integer
+A, B: unPaciente;
+i, j: integer;
 begin
 reset(Apac);
 for i:= 0 to filesize(Apac) - 2 do
@@ -809,8 +809,7 @@ for i:= 0 to filesize(Apac) - 2 do
              Read(APac, A);
              seek(APac, j);
              Read(APac, B);
-             if A.edad < B.edad
-                then
+             if A.edad < B.edad then
                     begin
                          seek(APac, i);
                          Write(APac, B);
@@ -819,6 +818,58 @@ for i:= 0 to filesize(Apac) - 2 do
                     end;
         end;
 end;
+
+Procedure mostrar_mirta;
+var
+P1, P2: unPaciente;
+cum: integer;
+i: integer;
+begin
+cum := 1;
+reset(APac);
+Read(APac, P1);
+Read(APac, P2);
+While P1.edad = P2.edad do
+      begin
+           cum := cum + 1;
+           Read(APac, P2);
+      end;
+Reset(APac);
+if cum <> 1 then
+   begin
+        Write('Los pacientes con el DNI ');
+        for i:= 0 to cum - 1 do
+            begin
+                 Read(APac, p1);
+                 Write(P1.DNI);
+                 if i <> cum -2 then
+                    begin
+                         if i = cum - 1 then
+                            begin
+                            write('');
+                            end
+                            else
+                            begin
+                                 write(', ');
+                            end;
+                    end
+                    else
+                    begin
+                      write(' y ');
+                    end;
+            end;
+
+        Writeln(' son los mayores, y tienen ', p1.edad, ' años');
+   end
+   else
+   begin
+        Writeln('El paciente con el DNI ', P1.DNI, ' es el mayor con ', P1.edad, ' años');
+   end;
+
+end;
+
+
+
 
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -908,7 +959,8 @@ clrscr;
     Writeln;Writeln;
     writeln('El promedio de edades de todos los pacientes atendidos es de: ',PromEdades:6:2);
     writeln('Ya se han curado ',TotalCurados,' pacientes');
-    mostrar_Mayor_paciente;
+    orden_por_edad;
+    mostrar_mirta;
 end;
 
 
