@@ -789,6 +789,7 @@ for i:= 0 to filesize(Apac) - 2 do
         end;
 end;
 
+//--------------------------------------------------------------------------------
 
 Procedure mostrar_mirta;
 var
@@ -796,18 +797,25 @@ P1, P2: unPaciente;
 cum: integer;
 i: integer;
 begin
-cum := 1;
-reset(APac);
-Read(APac, P1);
-Read(APac, P2);
-While P1.edad = P2.edad do
-      begin
-           cum := cum + 1;
-           Read(APac, P2);
-      end;
-Reset(APac);
-if cum <> 1 then
-   begin
+    reset(APac);
+    if filesize(APac) = 1 then
+        begin
+        read(APac,P1);
+        writeln('El paciente con el DNI ',P1.DNI,' es el mayor con ',P1.edad,' a',char(164),'os');
+        end
+    else
+    begin
+    cum := 1;
+    reset(APac);
+    Read(APac, P1);
+    repeat
+    read(APac,P2);
+    if  P1.edad = P2.edad then cum:=cum+1;
+    until (P1.edad <> P2.edad) or EOF(APac);
+
+    Reset(APac);
+    if cum <> 1 then
+    begin
         Write('Los pacientes con el DNI ');
         for i:= 0 to cum - 1 do
             begin
@@ -830,18 +838,14 @@ if cum <> 1 then
                     end;
             end;
 
-        Writeln(' son los mayores, y tienen ', p1.edad, ' a�os');
-   end
-   else
-   begin
-        Writeln('El paciente con el DNI ', P1.DNI, ' es el mayor con ', P1.edad, ' a�os');
-   end;
-
+        Writeln(' son los mayores con ', p1.edad,' a',char(164),'os');
+    end
+    else
+    begin
+        Writeln('El paciente con el DNI ', P1.DNI, ' es el mayor con ', P1.edad,' a',char(164),'os');
+    end;
+    end;
 end;
-
-
-
-
 
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -1315,7 +1319,7 @@ While not eof(AEnf) do                                                          
                       end
                       else
                       begin
-                           writeln('y se ha curado');
+                           writeln(' y se ha curado');
                       end;
               end
               else
@@ -1352,7 +1356,7 @@ begin
             writeln();
             writeln('1) Estadisticas de Sintomas');
             writeln('2) Estadisticas de Enfermedades (Promedio de edad)');
-            writeln('3) Estadisticas de Enfermedades (Pacientes atendidos y curados');
+            writeln('3) Estadisticas de Enfermedades (Pacientes atendidos y curados)');
             writeln('4) Quien fue el mayor atendido y cual es su edad?');
             writeln('5) Cual fue la provincia que mas enfermos atendio?');
             writeln('6) Pacientes ingresados en una fecha');
@@ -1384,12 +1388,12 @@ begin
                          else
                          enf_prom;
                 end;
-            3: if(filesize(AEnf)>0)then curados_por_enf else writeln('No hay enfermedades cargadas')
+            3: if(filesize(AEnf)>0)then curados_por_enf else writeln('No hay enfermedades cargadas');
 
-            4: if(filesize(Apac)>0)then mostrar_Mayor_paciente else writeln('No hay paceintes cargados');
+            4: if(filesize(Apac)>0)then mostrar_mirta else writeln('No hay paceintes cargados');
             5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay pacientes cargados');  //Si hay paceintes, hay provincias
             6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
-            7: writeln('MOSTRAME');
+            7: if(filesize(Ahist)>0)then muertos_por_enf else writeln('No hay historias clinicas cargadas');
             8: if(filesize(Ahist)>0)then nombre_efectores  else writeln('No hay efectores cargados');
             0: working:=False;
             end;
@@ -1676,9 +1680,9 @@ boot;
                 end;
         end;
 
-for q:= 1 to 300 do
+for q:= 1 to 5 do
 begin
-textcolor(q);writeln('Gracias por utilizar nuestro software :)':(q*4) mod 100);
+textcolor(q);writeln('Gracias por utilizar nuestro software :)');
 delay(1);
 end;
 readkey;
