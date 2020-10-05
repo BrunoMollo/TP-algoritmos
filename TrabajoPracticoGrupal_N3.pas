@@ -100,7 +100,7 @@ APac:file of unPaciente;
 AHist:file of unaHistoria;
 
 
-//para llevar registro de que tan cargado estan los arrays
+//para llevar rregistro de qeu tan cargado estan los arrays
 acum_sint:integer;
 acum_enf:integer;
 
@@ -165,7 +165,7 @@ end;
 
 
 
-Function rep_enf(reg:unaEnfermedad;campo:integer):boolean; //ingresa un registro de enfermedad y el numeor del campo que qeures chequar (1:cod, 2:desc)
+Function rep_enf(reg:unaEnfermedad;campo:integer):boolean; //ingresa un registro de enfermedad y el numeor del campo que queres chequar (1:cod, 2:desc)
 var aux:unaEnfermedad;                                      //Te va a tirar un true si esta repetido el campo, si nada se repita va un false
 begin
     rep_enf:=False;
@@ -199,9 +199,6 @@ begin
     end;
 end;
 
-
-
-
 function nomb_sint(cod:string[3]):string;  //le das un codigo y devuelve el nombre del sintoma en cuestion
 var mi_sint:unSintoma;
 begin
@@ -223,6 +220,7 @@ begin
         if mi_enf.cod=cod then nomb_enf:=mi_enf.desc;
     until (eof(Aenf)) or (mi_enf.cod=cod);
 end;
+
 
 
 
@@ -285,9 +283,6 @@ begin
 end;
 
 
-
-
-
 //Los is_in_array--#################################################################################################################################
 
 
@@ -318,11 +313,6 @@ begin
             end;
         end;
 end;
-
-
-
-
-
 
 //Funciones de validacion-###################################################################################################################################
 
@@ -447,8 +437,6 @@ begin
 end;
 
 
-
-
 Function cod_str_no_repetido(msn:string; arr:array of string[3]):string[3];     //FUNCION PARA VERIFICAR QUE NO SE REPITE UN CODIGO
 var                                                                        //Puede ser usado con el codigo de enfermedad y de sintoma ya qeu se toma el aprametro como array of string[3]
 aux:string[3];                                                             //El arrego debe ser limpiado antes de usar esta funcion
@@ -545,12 +533,15 @@ end;
 
 Procedure borramela; //esto esta para debugear, la idea es que no este en le programa final
 begin
-writeln('La base de datos ha fallecido');
-Rewrite(AProv);
-Rewrite(ASint);
-Rewrite(AEnf);
-Rewrite(APac);
-Rewrite(AHist);
+if opcion_binaria('ESTAS SEGURO???','S','N','MAY')='S' then
+begin
+    writeln('La base de datos ha fallecido');
+    Rewrite(AProv);
+    Rewrite(ASint);
+    Rewrite(AEnf);
+    Rewrite(APac);
+    Rewrite(AHist);
+end;
 end;
 
 Procedure mostrar_cosas;
@@ -659,6 +650,7 @@ begin
         arr[i]:=null;//null son tres caracteres nulos
 end;
 
+
 Procedure limpiar_char(var arr:array of char);     //LIMPIA LOS ARREGLOS
 var
 i:integer;
@@ -666,7 +658,6 @@ begin
     for i:= low(arr) to high(arr) do
         arr[i]:=char(0);
 end;
-
 
 
 Procedure sint_enf(var arr:array of string[3]);//capas que tendraimos que cambairle el nombre a este procedure, ahora se usa en hiitorias tmb
@@ -704,26 +695,6 @@ begin
 writeln(' ');
 end;
 
-
-{Procedure Mostrar_sintomas;   //Este procedure ese para el chapin enfermedades
-var i,j,k,acum:integer;
-begin
-reset(ASint);
-reset(AEnf);
-while not eof(ASint) do
-      begin
-      read(Asint,S);
-      writeln('El sintoma con el codigo ',S.cod,' es ',S.desc);
-      acum:=0;
-      while not eof(AEnf)do
-          begin
-              read(AEnf,E);
-              for i:= 1 to max_sint do
-              if (E.sintomas[i]=S.cod) then acum:=acum+1;
-          end;
-          writeln('Las enfermedades que la presentan son: ',acum);
-      end;
-end; }
 
 Procedure Mostrar_enfermedades;   //Este procedure ese para el chapin enfermedades
 begin
@@ -776,7 +747,8 @@ begin
       edades:=0;
       cont:=0;
       read(AEnf,Y);
-      reset(AHist);
+
+      reset(AHist);           //ok
       while not eof (AHist) do
             begin
                  read(AHist,Z);
@@ -794,6 +766,82 @@ begin
 end;
 end;
 
+Procedure orden_por_edad;
+var
+A, B: unPaciente;
+i, j: integer;
+begin
+reset(Apac);
+for i:= 0 to filesize(Apac) - 2 do
+    for j:= i+1 to filesize(Apac)-1 do
+        begin
+             seek(APac, i);
+             Read(APac, A);
+             seek(APac, j);
+             Read(APac, B);
+             if A.edad < B.edad then
+                    begin
+                         seek(APac, i);
+                         Write(APac, B);
+                         seek(APac, j);
+                         Write(APac, A);
+                    end;
+        end;
+end;
+
+
+Procedure mostrar_mirta;
+var
+P1, P2: unPaciente;
+cum: integer;
+i: integer;
+begin
+cum := 1;
+reset(APac);
+Read(APac, P1);
+Read(APac, P2);
+While P1.edad = P2.edad do
+      begin
+           cum := cum + 1;
+           Read(APac, P2);
+      end;
+Reset(APac);
+if cum <> 1 then
+   begin
+        Write('Los pacientes con el DNI ');
+        for i:= 0 to cum - 1 do
+            begin
+                 Read(APac, p1);
+                 Write(P1.DNI);
+                 if i <> cum -2 then
+                    begin
+                         if i = cum - 1 then
+                            begin
+                            write('');
+                            end
+                            else
+                            begin
+                                 write(', ');
+                            end;
+                    end
+                    else
+                    begin
+                      write(' y ');
+                    end;
+            end;
+
+        Writeln(' son los mayores, y tienen ', p1.edad, ' a�os');
+   end
+   else
+   begin
+        Writeln('El paciente con el DNI ', P1.DNI, ' es el mayor con ', P1.edad, ' a�os');
+   end;
+
+end;
+
+
+
+
 
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -805,21 +853,11 @@ end;
 
 Procedure Pacientes;        //INGRESO DE PACIENTES
 var
-fiambre,mirta:unpaciente;
+fiambre:unpaciente;
 auxprov:unaprovincia;
 
-{sanos:integer;}
-{curado:char;}
 begin
 clrscr;
-    //El mas viejo va a estar primero, entonces lo bajo
-    seek(APac,0);
-    if(filesize(APac)<>0) then read(APac,mirta)
-    else mirta.edad:=0;
-
-
-
-    {sanos:=0; }
 
     repeat
         writeln;
@@ -840,50 +878,20 @@ clrscr;
         fiambre.cant_enf:=0;//Empieza en cero, no???
         fiambre.dead:=opcion_binaria('Esta vivo o Muerto? (M/V) ','M','V','MAY');//hay que preguntar esto o va vivo por defecto????
 
-
-        if (filesize(APac)=0) then
-        begin
-            //Es el mas viejo porqeu llego primero
-            mirta.dni:=fiambre.dni;
-            mirta.edad:=fiambre.edad;
-            mirta.cod_prov:=fiambre.cod_prov;
-            mirta.cant_enf:=fiambre.cant_enf;
-            mirta.dead:=fiambre.dead;
-
-            write(APac,fiambre);
-        end
-        else
-        begin
-            if (fiambre.edad>mirta.edad) then
-                begin
-                    seek(APac,filesize(APac));
-                    write(Apac,mirta);//escribo al destronado al final
-
-                    //Efiambre se confierte en la nueva mirta
-                    mirta.dni:=fiambre.dni;
-                    mirta.edad:=fiambre.edad;
-                    mirta.cod_prov:=fiambre.cod_prov;
-                    mirta.cant_enf:=fiambre.cant_enf;
-                    mirta.dead:=fiambre.dead;
-
-                    seek(APac,0);
-                    write(APac,mirta);//Escribo el nuvo record al principio
-
-                end
-            else
-                begin
-                    seek(APac,filesize(APac));
-                    write(Apac,fiambre);
-                end;
-        end;
+        seek(Apac,filesize(Apac));
+        write(Apac,fiambre);
 
 
     until opcion_binaria('Desea ingresar otro paciente? (S/N) ','S','N','MAY')='N';
 
+
+    orden_por_edad;
+
     Writeln;Writeln;
     writeln('El promedio de edades de todos los pacientes atendidos es de: ',PromEdades:6:2);
     writeln('Ya se han curado ',TotalCurados,' pacientes');
-    mostrar_Mayor_paciente;
+    orden_por_edad;
+    mostrar_mirta;
 end;
 
 
@@ -934,12 +942,10 @@ while (a) do      //ACA CARGAMOS LAS ENFERMEDADES
 end;
 
 
-
-
-
 //                                                                                          #######################################################################
 //##################################################################################################################//////////////////////////////////////////////////
 //                                                                                          #######################################################################
+
 
 
 Procedure Sintomas;     //CARGA DE SINTOMAS
@@ -1052,7 +1058,6 @@ begin
         end;
 end;
 
-
 //PROVINCIAS FINAL      ----MODULO----
 Procedure Provincias;
 var i:integer;
@@ -1084,7 +1089,6 @@ begin                           //CARGA DE PROVINCIAS
 reset(AProv);
     writeln();
     Busqueda_Letra;
-    //write('La cantidad de provincias que empiezan con la letra S es de: ',);
     writeln();writeln();
     writeln('Codigo de provincias ordenado alfabeticamente');
     Ordenar(1);
@@ -1097,21 +1101,21 @@ end;
 //-----------------------------------------------------------------------------------------------------
 
 Procedure Provincia_con_mas_enfermos();
-var i,j,k,l:integer;
-indice,acum:integer;
+var i,j,k,l,m:integer;
+indice,indicex,acum2,acum:integer;
 codprov:array [1..cant_provincias] of char;
 cont_provincia:array[1..cant_provincias]of integer;
 begin
     reset(APac);
     reset(AProv);
-    for k:= 1 to filesize(AProv) do
+    for k:= 1 to filesize(AProv) do                  //SE PASA A UN ARRAY LAS PROVINCIAS
         begin
         read(AProv,P);
         codprov[k]:=P.cod;
         cont_provincia[k]:=0;
         end;
 
-    for i:= 1 to filesize(APac) do
+    for i:= 1 to filesize(APac) do                 //SE VA SUMANDO LA CANTIDAD DE ENFERMOS POR PROVINCIAS EN EL ARRAY AUXILIAR
         begin
             read(APac,C);
             for j:= 1 to cant_provincias do
@@ -1122,7 +1126,7 @@ begin
         end;
 
     acum:=0;
-    for l:= 1 to cant_provincias do
+    for l:= 1 to cant_provincias do               //BUSCO LA MAYOR Y GUARDO LA LETRA
         begin
             if (cont_provincia[l]>acum) then
                 begin
@@ -1130,12 +1134,24 @@ begin
                 indice:=l;
                 end;
         end;
+
+    acum2:=0;
+    for m:= 1 to cant_provincias do                //BUSCO SI HAY OTRA QUE SEA IGUAL Y ESTE EMPATADA
+        begin
+            if (acum = cont_provincia[m]) then
+                begin
+                acum2:=cont_provincia[m];
+                indicex:=m;
+                end;
+        end;
+
    writeln();
    writeln('La provincia con mas enfermos es la provincia con codigo ',codprov[indice]);
+   if (acum2<>0) and not (indicex = indice) then writeln('Y esta empatada con la provincia con codigo ',codprov[indicex]);
+
 
 
 end;
-
 
 
 Procedure IngresadosFecha;
@@ -1145,7 +1161,10 @@ var Auxhist:unaHistoria;
 begin
     pedida:=pedirFecha;
 
-    writeln('---------------------------');
+    writeln();
+    writeln('------------------------------------');
+    writeln('  DNI  ','      ','Nombre de la enfermedad');
+    writeln('------------------------------------');
 
     reset(Ahist);
     hay_algo:=False;
@@ -1155,16 +1174,78 @@ begin
         if auxhist.fecha_ingreso=pedida then
         begin
             hay_algo:=True;
-            writeln(Auxhist.dni,' - ',nomb_enf(Auxhist.cod_enf));
+            writeln(Auxhist.dni,' ',' - ',' ',nomb_enf(Auxhist.cod_enf));
         end;
     end;
     if not hay_algo then writeln('Parece que ningun paciente fue ingresado en esta fecha...');
 
 end;
 
-//--------------------------------------------------
 
-Procedure nombe_efectores;
+//..........................................................................
+Procedure muertos_por_enf;
+var
+enf: string[20];
+cum: integer;
+P:unPaciente;
+H:unaHistoria;
+E:unaEnfermedad;
+salida1:boolean;
+
+begin
+cum := 0;
+reset(APac);
+reset(AHist);
+reset(AEnf);
+salida1:= false;
+
+enf:=string_valido('Ingese el nombre de la enfermedad: ',1,20);                     //ingresa el nombre de la enf
+                                                                                                                                                                   //reads!!!
+while not eof(AEnf) do
+begin
+     Read(Aenf, E);
+     if enf = E.desc then                                                           //si el nombre coincide con el nombre de alguna enfermedad registrada
+         begin
+         Reset(AHist);
+            While not eof(AHist) do
+            begin
+            Read(AHist, H);
+
+            if E.cod = H.cod_enf then                                               //si el codigo de la enfermedad aparece en elguna historia clinica
+                begin
+                     salida1:= false;
+                     reset(APac);
+                     While (salida1=false) and not(eof(APac)) do
+                     begin
+                     Read(Apac, P);
+                          if H.DNI = P.DNI then                                     //si el DNI de esa historia coincide con el de algun paciente
+                              begin
+
+                                  if P.dead = 'M' then                           //si el paciente est?muerto
+                                     begin                                          //se cuenta
+                                          cum:= cum + 1;
+                                          salida1:= true;
+                                     end;
+                              end;
+
+                     end;                                                        //resetea los pacientes y busca otra historia en la que aparezca la enfermedad
+                end;
+            end;
+         end;
+
+end;
+
+//if eof(AEnf) then Writeln('La enfermedad ', enf, ' no ha sido registrada');                            //no encontro una enfermedad que se llame igual
+//if eof(AHist) and (cum = 0) then Writeln('Ningun paciente contrajo la enfermedad ', enf);                //no encontro una historia clinica con esa enfermedad
+if cum = 0 then Writeln ('Ningun paciente con la enfermedad ', enf, ' ha muerto');                      //no encontro ningun muerto
+if cum > 1 then Writeln(cum, ' pacientes han muerto de la enfermedad ', enf);
+if cum = 1 then Writeln(cum, ' paciente ha muerto de la enfermedad ', enf);
+
+end;
+//...........................................................................
+
+
+Procedure nombre_efectores;
 var
 nom: string[30];
 cum: integer;
@@ -1172,7 +1253,7 @@ H:unaHistoria;
 begin
 cum := 0;
 reset(AHist);
-nom:=string_valido('Nombre del efector: ',1,30);
+nom:=string_valido('Ingese el nombre del efector: ',1,30);
 while not eof(AHist) do
 begin
      read(AHist,H);
@@ -1190,8 +1271,68 @@ begin
 Writeln('El efector no existe o no atendio a ningun paciente');
 end;
 
+end;
 
 
+
+
+Procedure curados_por_enf;
+var
+cumAT, cumCU: integer;
+H:unaHistoria;
+E:unaEnfermedad;
+
+begin;
+reset(AEnf);
+While not eof(AEnf) do                                                              //Cada enfermedad
+      begin
+           Read(AEnf, E);
+           reset(AHist);
+           cumAT:= 0;
+           cumCU:= 0;
+           While not eof(AHist) do                                                  //Pacientes atendidos
+                 begin
+                      Read(AHist, H);
+                      if E.cod = H.cod_enf then
+                         begin
+                              cumAT:= cumAT + 1;                                     //Si encuentra el mismo codigo el la historia se atendio al paciente
+                              if H.curado = 'S' then cumCU:= cumCU + 1;
+                         end
+                         else
+                 end;
+           if cumAT = 0 then                                                                   //no encontro nadie con la enfermedad actual
+              begin
+                   Writeln('Ningun paciente atendido contrajo la enfermedad ', E.desc);
+              end
+              else
+              begin
+           if cumAT = 1 then
+              begin
+                   write(cumAT, ' paciente contrajo la enfermedad ', E.desc);
+                   if cumCU = 0 then
+                      begin
+                           writeln(' pero no se ha curado');
+                      end
+                      else
+                      begin
+                           writeln('y se ha curado');
+                      end;
+              end
+              else
+              begin
+                   write(cumAT, ' pacientes contrajeron la enfermedad ', E.desc);
+                   if cumCU = 0 then
+                      begin
+                           writeln(' pero ninguno se ha curado');
+                      end
+                      else
+                      begin
+                           writeln(' y ', cumCU, ' se han curado');
+                      end;
+              end;
+              end;
+              Writeln('----------------------------------------------------------------------------------');
+      end;
 end;
 
 
@@ -1214,13 +1355,14 @@ begin
             writeln('3) Estadisticas de Enfermedades (Pacientes atendidos y curados');
             writeln('4) Quien fue el mayor atendido y cual es su edad?');
             writeln('5) Cual fue la provincia que mas enfermos atendio?');
-            writeln('6) Paceintes ingresados en una fecha');
+            writeln('6) Pacientes ingresados en una fecha');
             writeln('7) Estadisticas de Personas fallecidas');
             writeln('8) Estadisticas de Pacientes atendidos');
             writeln('0) Salir');
             writeln();
             choice:=int_valido('Ingrese la opcion: ',0,8);
             Case choice of
+
             1:if (filesize(ASint)=0) then
                writeln('No hay sinomas ingresados')
             else
@@ -1242,9 +1384,10 @@ begin
                          else
                          enf_prom;
                 end;
-            3: writeln('MOSTRAME');
+            3: if(filesize(AEnf)>0)then curados_por_enf else writeln('No hay enfermedades cargadas')
+
             4: if(filesize(Apac)>0)then mostrar_Mayor_paciente else writeln('No hay paceintes cargados');
-            5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay paceintes cargados');  //Si hay paceintes, hay provincias
+            5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay pacientes cargados');  //Si hay paceintes, hay provincias
             6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
             7: writeln('MOSTRAME');
             8: if(filesize(Ahist)>0)then nombre_efectores  else writeln('No hay efectores cargados');
@@ -1261,6 +1404,7 @@ end;
 
 
 //-----------------------------------------------------------------------------------
+
 
 
 //                                                                                          #######################################################################
@@ -1297,15 +1441,6 @@ begin
         end;
     end;
 end;
-
-
-
-
-
-
-
-
-
 
 
 //------------------------------------------------------------------------------------------------------------
@@ -1398,10 +1533,80 @@ end;
 //###########################################################################################################################################
 //...............................................................................................................
 
+const
+cant_opciones=6;//No cuenta salir
+enter=char(13);
+arriba=char(80);
+abajo=char(72);
+type
+arr_opc=array[0..cant_opciones] of string[2];
+
+
+
+procedure mover_flecha(var op:arr_opc; pos:integer);
+var i:integer;
+begin
+    for i:=0 to cant_opciones do op[i]:='  ';
+    op[pos]:='<-';
+end;
+
+
+procedure detectar_flechas(var x:integer;elegida:char;min,max:integer);
+begin
+          //0->1->4->3->2->1->0
+          if (elegida=arriba)or (elegida='s') or (elegida='S') then
+          begin
+             x:=x+1;
+             if x>max then x:=min;
+          end
+          //1->2->3->4->1
+          else if (elegida=abajo) or (elegida='w') or (elegida='W')  then
+          begin
+             x:=x-1;
+             if x<min then x:=max;
+          end;
+end;
+
+
+function menu_copado:integer;
+var
+op:arr_opc;
+pos_actual:integer;
+elegida:char;
+begin
+    pos_actual:=1;
+
+    repeat
+        textcolor(4);writeln('-MENU PRINCIPAL-');textcolor(22);
+         mover_flecha(op,pos_actual);
+          writeln('Provincias ',op[1]);
+          writeln('Sintomas ',op[2]);
+          writeln('Enfermedades',op[3]);
+          writeln('Pacientes ',op[4]);
+          writeln('Historias clinicas ',op[5]);
+          writeln('Estadisticas',op[6]);
+          writeln('Salir ',op[0]);
+          textcolor(7);
+
+          elegida:=readkey;
+          detectar_flechas(pos_actual,elegida,0,cant_opciones);
+
+
+          clrscr;
+
+
+    until elegida=enter;
+
+    menu_copado:=pos_actual;
+end;
+
+
+//--<
 function menu(version:integer):integer;
 begin
-            textcolor(4);writeln('-MENU PRINCIPAL-');
-            textcolor(22);
+    if (version=1) or (version=0) then
+    begin
+            textcolor(4);writeln('-MENU PRINCIPAL-');textcolor(22);
             writeln('1) Provincias');
             writeln('2) Sintomas');
             writeln('3) Enfermedades');
@@ -1416,6 +1621,9 @@ begin
             writeln('0) Fin del Programa');textcolor(7);
             if version=0 then menu:=int_valido('Ingrese la opcion: ',0,8)
             else menu:=int_valido('Ingrese la opcion: ',0,6)
+    end
+    else if version=2 then menu:=menu_copado;
+
 end;
 
 
@@ -1468,9 +1676,10 @@ boot;
                 end;
         end;
 
-for q:= 1 to 5 do
+for q:= 1 to 300 do
 begin
-textcolor(q);writeln('Gracias por utilizar nuestro software :)');
+textcolor(q);writeln('Gracias por utilizar nuestro software :)':(q*4) mod 100);
+delay(1);
 end;
 readkey;
 END.
