@@ -10,7 +10,9 @@ Program TrabajoPracticoGrupal_V3;
 //****  -Puccini Martin                 ****/////
 //****                                  ****////
 //****      Comision: 109               ****///
-//******************************************//         *****
+//******************************************//
+
+// Este alumno se sumo para la version 3
 
 Uses CRT,sysutils;
 
@@ -30,12 +32,10 @@ null=char(0)+char(0)+char(0);
 
 Type
 cod=array [1..cant_provincias] of char;
-desc=array [1..cant_provincias] of string[20];
 cod_sintomas=array [1..cant_sint] of string[3];
-desc_sintomas=array [1..cant_sint] of string[30];
 cod_enfermedades=array [1..cant_enf] of string[3];
-desc_enfermedades=array [1..cant_enf] of string[30];
-matriz=array[1..cant_enf,1..max_sint]of string[3];
+
+
 
 
 
@@ -75,22 +75,18 @@ unaHistoria = record
 
 VAR
 //Para el menu principal
-Opcion,q:integer;
+q:integer;
 Andando:boolean;
 
 
 //para guardar distintos datos cargados por el usuario
 codprov:cod;
-detprov:desc;
 cod_sint:cod_sintomas;
-desc_sint:desc_sintomas;
 cod_enf:cod_enfermedades;
-desc_enf:desc_enfermedades;
-matriz_sintomas:matriz;
+
 P:unaProvincia;
 S:unSintoma;
 E:unaEnfermedad;
-H:unaHistoria;
 C:unPaciente;
 
 AProv:file of unaProvincia;
@@ -99,10 +95,6 @@ AEnf:file of unaEnfermedad;
 APac:file of unPaciente;
 AHist:file of unaHistoria;
 
-
-//para llevar rregistro de qeu tan cargado estan los arrays
-acum_sint:integer;
-acum_enf:integer;
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -258,15 +250,6 @@ begin
         suma:=suma+pacAux.edad;
     end;
     promEdades:=suma/filesize(APac);
-end;
-
-
-Procedure mostrar_Mayor_paciente;
-var veterano:unpaciente;
-begin
-    seek(Apac,0);
-    read(Apac,veterano);
-    writeln('El paciente con mayor edad tiene ',veterano.edad,' y su DNI es ',veterano.dni);
 end;
 
 
@@ -451,20 +434,7 @@ begin
 end;
 
 
-Function cod_char_no_repetido(msn:string; arr:array of char):char;     //FUNCION PARA VERIFICAR QUE NO SE REPITE UN CODIGO DE CARACTER
-var
-aux:char;
-begin
-    repeat
-    aux:=char_valido(msn,'A','Z','MAY');
-    if (is_in_array(arr,aux)) then
-        MostrarError('Ya ingresaste '+aux);
-    until not (is_in_array(arr,aux));
-   cod_char_no_repetido:=aux;
-end;
-
-
-function pedirFecha:TdateTime;
+Function pedirFecha:TdateTime;
 var d,m,a:integer;
 begin
     repeat
@@ -612,35 +582,6 @@ begin
 
 end;
 
-Procedure ordenar_provincias(c:cod; d:desc; modo:integer);        //MUESTRA LAS PROVINICIAS ORDENADAS,
-var                                                               //MODO=1 -->ORDENA POR CODIGO  ;  MODO=2 -->ORDENA POR NOMBRE
-i,j:integer;
-bool_modo_1, bool_modo_2:boolean;
-aux1:char;
-aux20:string[20];
-begin
-    for i:=1 to cant_provincias-1 do
-        for j:=i+1 to cant_provincias do
-        begin
-            bool_modo_1:=(modo=1)and(c[i]>c[j]);      //Se hace un intercabio de los dos elementos tomado
-            bool_modo_2:=(modo=2)and(d[i]>d[j]);     //si se esta ordenando por el codigo(modo=1) y los codigoas analizados estan desordenados(c[i]>c[j]),
-            if (bool_modo_1) or (bool_modo_2) then   //o si se esta ordenando por el nombre(modo=2) y los nombre sanalizaods estan desordenados(d[i]>d[j])
-            begin
-                //Intercambio en el array del codigo
-                aux1:=c[i];
-                c[i]:=c[j];
-                c[j]:=aux1;
-                //Intercambio en el array del nombre
-                aux20:=d[i];
-                d[i]:=d[j];
-                d[j]:=aux20;
-            end;
-        end;
-    //MUESTRA
-    for i:= 1 to cant_provincias do
-        writeln(c[i],' ------- ',d[i]);
-end;
-
 
 Procedure limpiar_str3(var arr:array of string[3]);     //LIMPIA LOS ARREGLOS
 var
@@ -663,8 +604,7 @@ end;
 Procedure sint_enf(var arr:array of string[3]);//capas que tendraimos que cambairle el nombre a este procedure, ahora se usa en hiitorias tmb
 var                                     //ver si hay alguna funcion que me sirva para revisar el array de sintomas
                                         //cod_str_no_repetido?
-i,cont:integer;
-auxiliar:string[3];
+i:integer;
 SintAux:unSintoma;
 
 begin
@@ -955,7 +895,6 @@ end;
 Procedure Sintomas;     //CARGA DE SINTOMAS
 var
 a:boolean;
-i:integer;
 x:unSintoma;
 begin
 clrscr;
@@ -1278,8 +1217,6 @@ end;
 end;
 
 
-
-
 Procedure curados_por_enf;
 var
 cumAT, cumCU: integer;
@@ -1340,7 +1277,7 @@ While not eof(AEnf) do                                                          
 end;
 
 
-//--------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------
 Procedure Estadisticas();
 var
 working:boolean;
@@ -1407,24 +1344,6 @@ begin
 end;
 
 
-//-----------------------------------------------------------------------------------
-
-
-
-//                                                                                          #######################################################################
-//##################################################################################################################//////////////////////////////////////////////////
-//                                                                                          #######################################################################
-
-
-
-
-
-
-
-
-
-
-
 //                                                                                          #######################################################################
 //##################################################################################################################//////////////////////////////////////////////////
 //                                                                                          #######################################################################
@@ -1452,9 +1371,7 @@ end;
 Procedure historias;
 var auxPac:unpaciente;
     auxEnf:unaEnfermedad;
-    auxSint:unSintoma;
     auxHist:unahistoria;
-    csint,i:integer;
     seguir:char;
 begin
     clrscr;
@@ -1496,9 +1413,10 @@ begin
                 Agregar_enfermedad(auxHist.dni);
 
                 writeln;
-                Mostrar_sint(auxHist.cod_enf);
-
                 auxHist.curado:=opcion_binaria('Se ha curado?(S/N): ','S','N','MAY');
+
+                writeln;
+                Mostrar_sint(auxHist.cod_enf);
 
                 writeln;
                 writeln('Ingresar sintomas que presenta el paciente');
@@ -1523,14 +1441,6 @@ begin
 
 
 end;
-
-
-
-//                                                                                          #######################################################################
-//##################################################################################################################//////////////////////////////////////////////////
-//                                                                                          #######################################################################
-
-
 
 
 //...................................................................................................................................................
@@ -1642,11 +1552,6 @@ end;
 BEGIN
 boot;
 
-
-
-    //Inicializacion de vairaibles
-    acum_sint:=0;
-    acum_enf:=0;
     limpiar_str3(cod_sint);
     limpiar_str3(cod_enf);
     limpiar_char(codprov);
@@ -1656,7 +1561,7 @@ boot;
     while Andando = True do
         begin
 
-            Case menu(0) of
+            Case menu(2) of        //2 MENU COPADO - - - - 1 MENU COMUNACHO - - - - 0 MENU DEBUGGER
             1: Provincias;
             2: Sintomas;
             3: if (filesize(ASint)<>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
