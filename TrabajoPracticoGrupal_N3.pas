@@ -58,6 +58,7 @@ unPaciente = record
            cod_prov:char;
            cant_enf:integer;
            dead:char;
+           causa_muerte:string[3];
            end;
 unaHistoria = record
             DNI:string[8];
@@ -440,10 +441,11 @@ begin
     repeat
         d:=int_valido('Ingresar dia: ',1,31);
         m:=int_valido('Ingresar mes: ',1,12);
-        a:=int_valido('Ingresar a'+char(164)+'os: ',0,3000);
+        a:=int_valido('Ingresar a'+char(164)+'os: ',1900,2100);
         pedirFecha:=encodeDate(a,m,d);
         if date_to_str(pedirFecha)<>format ('%d/%d/%d ',[d,m,a]) then writeln(format ('%d/%d/%d ',[d,m,a]),' no existe');
-    until date_to_str(pedirFecha)=format ('%d/%d/%d ',[d,m,a]);
+        if pedirFecha>date then writeln('NO llegamos a esa fecha todavia');
+    until (pedirFecha<=date)and(date_to_str(pedirFecha)=format ('%d/%d/%d ',[d,m,a]));
 end;
 
 
@@ -562,7 +564,7 @@ begin
                 while not eof(Apac) do
                 begin
                     read(Apac,pac);
-                    writeln(pac.dni,' - ',pac.edad,' - ',pac.cod_prov,' - ',pac.cant_enf,' - ',pac.dead);
+                    writeln(pac.dni,' - ',pac.edad,' - ',pac.cod_prov,' - ',pac.cant_enf,' - ',pac.dead,' - ',pac.causa_muerte);
                 end;
             end;
         '5':begin
@@ -821,7 +823,7 @@ clrscr;
 
         fiambre.cant_enf:=0;//Empieza en cero, no???
         fiambre.dead:=opcion_binaria('Esta vivo o Muerto? (M/V) ','M','V','MAY');//hay que preguntar esto o va vivo por defecto????
-
+        fiambre.causa_muerte:=null;
         seek(Apac,filesize(Apac));
         write(Apac,fiambre);
 
@@ -1142,47 +1144,30 @@ reset(AHist);
 reset(AEnf);
 salida1:= false;
 
-enf:=string_valido('Ingese el nombre de la enfermedad: ',1,20);                     //ingresa el nombre de la enf
-                                                                                                                                                                   //reads!!!
-while not eof(AEnf) do
+enf:=string_valido('Ingese el codigo de la enfermedad: ',1,3);                     //ingresa el nombre de la enf
+
+E.cod:=enf;
+if not rep_enf(E,1) then writeln('La enfermeddad no esta registrada')
+else
 begin
-     Read(Aenf, E);
-     if enf = E.desc then                                                           //si el nombre coincide con el nombre de alguna enfermedad registrada
-         begin
-         Reset(AHist);
-            While not eof(AHist) do
-            begin
-            Read(AHist, H);
 
-            if E.cod = H.cod_enf then                                               //si el codigo de la enfermedad aparece en elguna historia clinica
-                begin
-                     salida1:= false;
-                     reset(APac);
-                     While (salida1=false) and not(eof(APac)) do
-                     begin
-                     Read(Apac, P);
-                          if H.DNI = P.DNI then                                     //si el DNI de esa historia coincide con el de algun paciente
-                              begin
-
-                                  if P.dead = 'M' then                           //si el paciente est?muerto
-                                     begin                                          //se cuenta
-                                          cum:= cum + 1;
-                                          salida1:= true;
-                                     end;
-                              end;
-
-                     end;                                                        //resetea los pacientes y busca otra historia en la que aparezca la enfermedad
-                end;
-            end;
-         end;
-
+reset(Apac);
+while not eof(Apac) do
+begin
+    read(Apac,P);
+    if P.causa_muerte=enf then cum:=cum+1;
 end;
+
+
+
 
 //if eof(AEnf) then Writeln('La enfermedad ', enf, ' no ha sido registrada');                            //no encontro una enfermedad que se llame igual
 //if eof(AHist) and (cum = 0) then Writeln('Ningun paciente contrajo la enfermedad ', enf);                //no encontro una historia clinica con esa enfermedad
 if cum = 0 then Writeln ('Ningun paciente con la enfermedad ', enf, ' ha muerto');                      //no encontro ningun muerto
 if cum > 1 then Writeln(cum, ' pacientes han muerto de la enfermedad ', enf);
 if cum = 1 then Writeln(cum, ' paciente ha muerto de la enfermedad ', enf);
+end;
+
 
 end;
 //...........................................................................
@@ -1291,14 +1276,14 @@ begin
             writeln('ESTADISTICAS');
             writeln('-------------');
             writeln();
-            writeln('1) Estadisticas de Sintomas');
-            writeln('2) Estadisticas de Enfermedades (Promedio de edad)');
-            writeln('3) Estadisticas de Enfermedades (Pacientes atendidos y curados)');
-            writeln('4) Quien fue el mayor atendido y cual es su edad?');
-            writeln('5) Cual fue la provincia que mas enfermos atendio?');
+            writeln('1) Enfermedades por sintomas');
+            writeln('2) Promedio de edad por enfermedad');
+            writeln('3) Pacientes atendidos y curados por enfermedad');
+            writeln('4) Quien fue el mayor atendido y cual es su edad');
+            writeln('5) Cual fue la provincia que mas enfermos atendio');
             writeln('6) Pacientes ingresados en una fecha');
-            writeln('7) Estadisticas de Personas fallecidas');
-            writeln('8) Estadisticas de Pacientes atendidos');
+            writeln('7) Personas fallecidas por una enfermedad');
+            writeln('8) Pacientes atendidos por un efector');
             writeln('0) Salir');
             writeln();
             choice:=int_valido('Ingrese la opcion: ',0,8);
@@ -1327,8 +1312,8 @@ begin
                 end;
             3: if(filesize(AEnf)>0)then curados_por_enf else writeln('No hay enfermedades cargadas');
 
-            4: if(filesize(Apac)>0)then mostrar_mirta else writeln('No hay paceintes cargados');
-            5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay pacientes cargados');  //Si hay paceintes, hay provincias
+            4: if(filesize(Apac)>0)then mostrar_mirta else writeln('No hay pacientes cargados');
+            5: if(filesize(Apac)>0)then Provincia_con_mas_enfermos else writeln('No hay pacientes cargados');  //Si hay pacientes, hay provincias
             6: if(filesize(Ahist)>0)then  IngresadosFecha else writeln('No hay historias clinicas cargadas');
             7: if(filesize(Ahist)>0)then muertos_por_enf else writeln('No hay historias clinicas cargadas');
             8: if(filesize(Ahist)>0)then nombre_efectores  else writeln('No hay efectores cargados');
@@ -1347,7 +1332,7 @@ end;
 //                                                                                          #######################################################################
 //##################################################################################################################//////////////////////////////////////////////////
 //                                                                                          #######################################################################
-Procedure Agregar_enfermedad(DNI:string[8]);
+Function Agregar_enfermedad(DNI:string[8]; enf:string[3]):boolean;
 var P:unPaciente;
 begin
 
@@ -1359,6 +1344,22 @@ begin
         if P.dni=DNI then
         begin
             P.cant_enf:=P.cant_enf+1;
+
+            if enf<>null then
+            begin
+            textcolor(red);
+            writeln('AVISO: ESTE PACINETE YA HA FALLECIDO POR LA ENFERMEDAD ',P.causa_muerte,', PUEDE LLEGAR A SOBREESCRIBIR DATOS');
+            textcolor(7);end;
+
+            if opcion_binaria('Ha muerto por esta enfermedad?(S/N): ','S','N','MAY')='S' then
+                begin
+                    P.causa_muerte:=enf;
+                    P.dead:='M';
+                    Agregar_enfermedad:=false;
+                end
+                else Agregar_enfermedad:=true;
+
+
             seek(Apac,filepos(Apac)-1);
             write(Apac,p);
         end;
@@ -1399,10 +1400,11 @@ begin
             if not rep_enf(auxEnf,1) then
             begin
                 writeln('NO tenemos registrado esa enfermedad');
-                seguir:=opcion_binaria('Quiere volvear a intentar?(S/N): ','S','N','MAY');
-
+                seguir:=opcion_binaria('Quiere volvear a intentar?(S/N): ','S','N','MAY')
             end;
         until (rep_enf(auxEnf,1)) or (seguir='N');
+
+
 
 
         //pido resto de los datos
@@ -1410,16 +1412,18 @@ begin
             begin
                 auxHist.dni:=auxPac.dni;
                 auxHist.cod_enf:=auxEnf.cod;
-                Agregar_enfermedad(auxHist.dni);
 
                 writeln;
-                auxHist.curado:=opcion_binaria('Se ha curado?(S/N): ','S','N','MAY');
+                if Agregar_enfermedad(auxHist.dni,auxHist.cod_enf) then
+                    auxHist.curado:=opcion_binaria('Se ha curado?(S/N): ','S','N','MAY')
+                else
+                    auxHist.curado:='N';
 
                 writeln;
                 Mostrar_sint(auxHist.cod_enf);
 
                 writeln;
-                writeln('Ingresar sintomas que presenta el paciente');
+                writeln('Ingresar sintomas que presento el paciente');
                 sint_enf(auxHist.sintomas);
 
                 auxHist.efector:=string_valido('Nombre del efector: ',1,30);
@@ -1561,7 +1565,7 @@ boot;
     while Andando = True do
         begin
 
-            Case menu(2) of        //2 MENU COPADO - - - - 1 MENU COMUNACHO - - - - 0 MENU DEBUGGER
+            Case menu(0) of        //2 MENU COPADO - - - - 1 MENU COMUNACHO - - - - 0 MENU DEBUGGER
             1: Provincias;
             2: Sintomas;
             3: if (filesize(ASint)<>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
