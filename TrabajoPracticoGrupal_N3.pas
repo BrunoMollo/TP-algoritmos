@@ -37,8 +37,6 @@ cod_enfermedades=array [1..cant_enf] of string[3];
 
 
 
-
-
 unaProvincia = record
              cod:char;
              desc:string[20];
@@ -669,6 +667,7 @@ reset(ASint);
                      acum:=acum+1;
                  end;
            writeln('El sintoma ',x.desc,', codigo ',x.cod,' es presentado por ',acum,' enfermedades');
+           Writeln('----------------------------------------------------------------------------------');
            end;
 end;
 
@@ -699,7 +698,11 @@ begin
                            cont:=cont+1;
                       end;
             end;
-      if cont<>0 then writeln('El promedio de pacientes con la enfermedad: ',Y.desc,' fue de ',edades/cont:6:1);
+      if cont<>0 then
+        begin
+        writeln('El promedio de pacientes con la enfermedad: ',Y.desc,' fue de ',edades/cont:6:1);
+        Writeln('----------------------------------------------------------------------------------');
+        end;
 end;
 end;
 
@@ -801,14 +804,14 @@ begin
 clrscr;
 
     repeat
-        writeln;
+        clrscr;
         //Chequeo que no haya dni repetido
         repeat
             fiambre.dni:=string_num_valido('Ingrese el numero del DNI: ',1,8);
             if rep_pac(fiambre,1) then MostrarError('Ya ingresaron ese DNI');
         until not rep_pac(fiambre,1);
 
-        fiambre.edad:=int_valido('Ingrese la edad del paciente: ',0,125);
+        fiambre.edad:=int_valido('Ingrese la edad del paciente: ',1,125);
 
         repeat
             auxprov.cod:=char_valido('Ingrese codigo de provincia: ','A','Z','MAY');
@@ -824,11 +827,11 @@ clrscr;
 
 
     until opcion_binaria('Desea ingresar otro paciente? (S/N) ','S','N','MAY')='N';
-
+    writeln();
 
     orden_por_edad;
 
-    Writeln;Writeln;
+    Writeln;
     writeln('El promedio de edades de todos los pacientes atendidos es de: ',PromEdades:6:2);
     writeln('Ya se han curado ',TotalCurados,' pacientes');
     orden_por_edad;
@@ -853,6 +856,7 @@ seek(AEnf,filesize(AEnf));
 
 while (a) do      //ACA CARGAMOS LAS ENFERMEDADES
       begin
+           clrscr;
            seek(AEnf,filesize(AEnf));
            repeat
                 x.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
@@ -1026,10 +1030,14 @@ begin                           //CARGA DE PROVINCIAS
 reset(AProv);
     writeln();
     Busqueda_Letra;
-    writeln();writeln();
+    writeln();
+    writeln('Presione cualquier tecla para ver las provincias ordenadas por codigo alfabeticamente');readkey();
+    clrscr;
     writeln('Codigo de provincias ordenado alfabeticamente');
     Ordenar(1);
     writeln();
+    writeln('Presione cualquier tecla para ver las provincias ordenadas por nombre alfabeticamente');readkey();
+    clrscr;
     writeln('Provincias ordenadas alfabeticamente');
     Ordenar(2);
 
@@ -1082,7 +1090,6 @@ begin
                 end;
         end;
 
-   writeln();
    writeln('La provincia con mas enfermos es la provincia con codigo ',codprov[indice]);
    if (acum2<>0) and not (indicex = indice) then writeln('Y esta empatada con la provincia con codigo ',codprov[indicex]);
 
@@ -1276,6 +1283,7 @@ begin
             writeln('0) Salir');
             writeln();
             choice:=int_valido('Ingrese la opcion: ',0,8);
+            if choice <> 0 then clrscr;
             Case choice of
 
             1:if (filesize(ASint)=0) then
@@ -1310,6 +1318,7 @@ begin
             end;
            if(choice<>0) then
                 begin
+                    writeln();
                     writeln('Press any key to continue...');readkey;
                 end;
 
@@ -1483,7 +1492,9 @@ begin
     pos_actual:=1;
 
     repeat
-        textcolor(4);writeln('-MENU PRINCIPAL-');textcolor(22);
+        textcolor(4);writeln('MENU PRINCIPAL');
+        writeln('---------------');textcolor(22);
+        writeln();
          mover_flecha(op,pos_actual);
           writeln('Provincias ',op[1]);
           writeln('Sintomas ',op[2]);
@@ -1512,7 +1523,9 @@ function menu(version:integer):integer;
 begin
     if (version=1) or (version=0) then
     begin
-            textcolor(4);writeln('-MENU PRINCIPAL-');textcolor(22);
+            textcolor(4);writeln('MENU PRINCIPAL');
+            writeln('---------------');textcolor(22);
+            writeln();
             writeln('1) Provincias');
             writeln('2) Sintomas');
             writeln('3) Enfermedades');
@@ -1553,7 +1566,7 @@ boot;
     while Andando = True do
         begin
 
-            Case menu(0) of        //2 MENU COPADO - - - - 1 MENU COMUNACHO - - - - 0 MENU DEBUGGER
+            Case menu(2) of        //2 MENU COPADO - - - - 1 MENU COMUNACHO - - - - 0 MENU DEBUGGER
             1: Provincias;
             2: Sintomas;
             3: if (filesize(ASint)<>0) then Enfermedades else writeln('Todavia no fueron cargados los sintomas');
