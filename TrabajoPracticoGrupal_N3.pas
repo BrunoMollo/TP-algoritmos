@@ -19,7 +19,7 @@ Uses CRT,sysutils;
 //Constantes------------------------------------------------------------------------------
 
 Const
-cant_provincias=5;
+cant_provincias=24;
 cant_sint=20;
 cant_enf=10;
 max_sint=6;
@@ -104,15 +104,12 @@ AHist:file of unaHistoria;
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
-
 Function date_to_str(date:TdateTime):string;
 Var YY,MM,DD : Word;
 begin
  DeCodeDate (Date,YY,MM,DD);
  date_to_str:=(format ('%d/%d/%d ',[dd,mm,yy]));
 end;
-
-
 
 
 Function rep_sint(reg:unsintoma;campo:integer):boolean; //ingresa un registro de sintoma y el numeor del campo que qeures chequar (1:cod, 2:desc)
@@ -192,7 +189,7 @@ begin
     end;
 end;
 
-function nomb_sint(cod:string[3]):string;  //le das un codigo y devuelve el nombre del sintoma en cuestion
+Function nomb_sint(cod:string[3]):string;  //le das un codigo y devuelve el nombre del sintoma en cuestion
 var mi_sint:unSintoma;
 begin
     reset(Asint);
@@ -203,7 +200,7 @@ begin
     until eof(Asint) or (mi_sint.cod=cod);
 end;
 
-function nomb_enf(cod:string[3]):string;  //le das un codigo y devuelve el nombre de la enfermedad en cuestion
+Function nomb_enf(cod:string[3]):string;  //le das un codigo y devuelve el nombre de la enfermedad en cuestion
 var mi_enf:unaEnfermedad;
 begin
     reset(Aenf);
@@ -213,8 +210,6 @@ begin
         if mi_enf.cod=cod then nomb_enf:=mi_enf.desc;
     until (eof(Aenf)) or (mi_enf.cod=cod);
 end;
-
-
 
 
 
@@ -951,9 +946,6 @@ end;
 //##################################################################################################################//////////////////////////////////////////////////
 //                                                                                          #######################################################################
 
-//PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL
-//PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL
-//PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL PROVINCIAS FINAL
 
 Procedure Busqueda_Letra;
 var acum:integer;
@@ -1133,16 +1125,13 @@ var
 enf: string[20];
 cum: integer;
 P:unPaciente;
-H:unaHistoria;
 E:unaEnfermedad;
-salida1:boolean;
 
 begin
 cum := 0;
 reset(APac);
 reset(AHist);
 reset(AEnf);
-salida1:= false;
 
 enf:=string_valido('Ingese el codigo de la enfermedad: ',1,3);                     //ingresa el nombre de la enf
 
