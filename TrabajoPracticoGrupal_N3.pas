@@ -1345,11 +1345,10 @@ begin
         begin
             P.cant_enf:=P.cant_enf+1;
 
-            if enf<>null then
-            begin
             textcolor(red);
-            writeln('AVISO: ESTE PACINETE YA HA FALLECIDO POR LA ENFERMEDAD ',P.causa_muerte,', PUEDE LLEGAR A SOBREESCRIBIR DATOS');
-            textcolor(7);end;
+            if P.causa_muerte<>null then writeln('AVISO: ESTE PACIENTE YA HA FALLECIDO POR LA ENFERMEDAD ',P.causa_muerte,', PUEDE LLEGAR A SOBREESCRIBIR DATOS')
+            else if P.dead='M' then writeln('AVISO: EL PACEINTE YA ESTA MUERTO');
+            textcolor(7);
 
             if opcion_binaria('Ha muerto por esta enfermedad?(S/N): ','S','N','MAY')='S' then
                 begin
@@ -1413,7 +1412,7 @@ begin
                 auxHist.dni:=auxPac.dni;
                 auxHist.cod_enf:=auxEnf.cod;
 
-                writeln;
+
                 if Agregar_enfermedad(auxHist.dni,auxHist.cod_enf) then
                     auxHist.curado:=opcion_binaria('Se ha curado?(S/N): ','S','N','MAY')
                 else
