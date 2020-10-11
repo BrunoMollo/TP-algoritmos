@@ -1287,23 +1287,23 @@ begin
             Case choice of
 
             1:if (filesize(ASint)=0) then
-               writeln('No hay sinomas ingresados')
+               writeln('No hay sinomas cargados')
             else
 
                      if (filesize(AEnf)=0) then
-                        writeln('No hay enfermedades ingresados')
+                        writeln('No hay enfermedades cargadas')
                      else
                          Resumen_sint;
 
             2: if (filesize(AEnf)=0) then
-               writeln('No hay enfermedades ingresadas')
+               writeln('No hay enfermedades cargadas')
             else
                 begin
                      if (filesize(APac)=0) then
-                        writeln('No hay pacientes ingresados')
+                        writeln('No hay pacientes cargados')
                      else
                          if (filesize(AHist)=0) then
-                            writeln('No hay historias ingresadas')
+                            writeln('No hay historias cargadas')
                          else
                          enf_prom;
                 end;
