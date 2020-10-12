@@ -856,7 +856,6 @@ seek(AEnf,filesize(AEnf));
 
 while (a) do      //ACA CARGAMOS LAS ENFERMEDADES
       begin
-           clrscr;
            seek(AEnf,filesize(AEnf));
            repeat
                 x.cod:=string_valido('Ingrese el codigo de la enfermedad: ',1,3);
